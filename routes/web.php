@@ -2,9 +2,13 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+    ]);
 });
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
@@ -38,6 +42,7 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
 
 Route::middleware(['auth', 'role:USER'])->group(function () {
     Route::get('my-profile', [\App\Http\Controllers\UserProfileController::class, 'show'])->name('my-profile.show');
+    Route::put('my-profile', [\App\Http\Controllers\UserProfileController::class, 'update'])->name('my-profile.update');
     
     // User Payments
     Route::get('payments', [\App\Http\Controllers\User\PaymentController::class, 'index'])->name('user.payments.index');

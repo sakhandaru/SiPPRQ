@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class AdminUserController extends Controller
 {
@@ -15,7 +16,10 @@ class AdminUserController extends Controller
     public function index()
     {
         $users = User::with('residentProfile')->paginate(10);
-        return view('admin.users.index', compact('users'));
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'success' => session('success'),
+        ]);
     }
 
     /**
@@ -23,7 +27,7 @@ class AdminUserController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create');
+        return Inertia::render('Admin/Users/Create');
     }
 
     /**
@@ -45,6 +49,7 @@ class AdminUserController extends Controller
             'pendidikan' => 'required_if:role,USER|in:SMP,SMA,KULIAH|nullable',
             'institusi' => 'nullable|string',
             'tahun_masuk' => 'required_if:role,USER|integer|nullable',
+            'foto_profile' => 'nullable|image|max:2048',
         ]);
 
         $user = User::create([
@@ -64,28 +69,19 @@ class AdminUserController extends Controller
                 'pendidikan' => $validated['pendidikan'],
                 'institusi' => $validated['institusi'] ?? null,
                 'tahun_masuk' => $validated['tahun_masuk'],
+                'foto_profile' => $request->file('foto_profile') ? $request->file('foto_profile')->store('resident-photos', 'public') : null,
             ]);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $user = User::with('residentProfile')->findOrFail($id);
-        return view('admin.users.show', compact('user'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $user = User::with('residentProfile')->findOrFail($id);
-        return view('admin.users.edit', compact('user'));
+        return Inertia::render('Admin/Users/Edit', [
+            'user' => $user
+        ]);
     }
 
     /**
@@ -108,6 +104,7 @@ class AdminUserController extends Controller
             'pendidikan' => 'nullable|required_if:role,USER|in:SMP,SMA,KULIAH',
             'institusi' => 'nullable|string',
             'tahun_masuk' => 'nullable|required_if:role,USER|integer',
+            'foto_profile' => 'nullable|image|max:2048',
         ]);
 
         $user->update($request->only(['name', 'email', 'role', 'status', 'phone']));
@@ -126,6 +123,15 @@ class AdminUserController extends Controller
                     'social_instagram', 'social_facebook', 'social_linkedin'
                 ])
             );
+
+            if ($request->hasFile('foto_profile')) {
+                // Delete old photo if exists
+                if ($user->residentProfile->foto_profile) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($user->residentProfile->foto_profile);
+                }
+                $path = $request->file('foto_profile')->store('resident-photos', 'public');
+                $user->residentProfile()->update(['foto_profile' => $path]);
+            }
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
@@ -136,7 +142,10 @@ class AdminUserController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('residentProfile')->findOrFail($id);
+        if ($user->residentProfile && $user->residentProfile->foto_profile) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->residentProfile->foto_profile);
+        }
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }

@@ -4,19 +4,43 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Inertia\Inertia;
+use Illuminate\Validation\Rule;
+
 class UserProfileController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-
-    /**
-     * Handle the incoming request.
-     */
     public function show(Request $request)
     {
-        // Users can only view their own profile
         $user = $request->user()->load('residentProfile');
-        return view('user.profile.show', compact('user'));
+        return Inertia::render('User/Profile', [
+            'user' => $user,
+            'profile' => $user->residentProfile,
+            'status' => session('status'),
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = $request->user();
+        
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'occupation' => ['nullable', 'string', 'max:100'],
+            'is_married' => ['required', 'boolean'],
+        ]);
+
+        $user->update(['name' => $validated['name']]);
+
+        $user->residentProfile()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'phone' => $validated['phone'],
+                'occupation' => $validated['occupation'],
+                'is_married' => $validated['is_married'],
+            ]
+        );
+
+        return back()->with('status', 'Profile updated successfully!');
     }
 }

@@ -8,6 +8,8 @@ use App\Models\Cashflow;
 use App\Models\Balance;
 use Illuminate\Support\Facades\DB;
 
+use Inertia\Inertia;
+
 class CashflowController extends Controller
 {
     public function index()
@@ -15,7 +17,11 @@ class CashflowController extends Controller
         $cashflows = Cashflow::with('creator')->latest()->paginate(20);
         $balance = Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
         
-        return view('admin.cashflows.index', compact('cashflows', 'balance'));
+        return Inertia::render('Admin/Cashflows/Index', [
+            'cashflows' => $cashflows,
+            'balance' => $balance,
+            'success' => session('success'),
+        ]);
     }
 
     public function store(Request $request)

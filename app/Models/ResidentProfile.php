@@ -22,6 +22,7 @@ class ResidentProfile extends Model
         'social_instagram',
         'social_facebook',
         'social_linkedin',
+        'foto_profile',
     ];
 
     protected $casts = [

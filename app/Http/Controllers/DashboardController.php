@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Inertia\Inertia;
+
 class DashboardController extends Controller
 {
     public function index()
@@ -12,11 +14,20 @@ class DashboardController extends Controller
 
         if ($user->role === 'ADMIN') {
             $data = [];
-            $data['balance'] = \App\Models\Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
+            $balance = \App\Models\Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
+            $data['balance'] = [
+                'current_balance' => $balance->current_balance,
+                'current_balance_fmt' => number_format($balance->current_balance, 0, ',', '.'),
+            ];
             $data['total_in'] = \App\Models\Cashflow::where('direction', 'IN')->sum('amount');
+            $data['total_in_fmt'] = number_format($data['total_in'], 0, ',', '.');
             $data['total_out'] = \App\Models\Cashflow::where('direction', 'OUT')->sum('amount');
+            $data['total_out_fmt'] = number_format($data['total_out'], 0, ',', '.');
             
-            return view('dashboard', compact('data'));
+            return Inertia::render('Dashboard', [
+                'data' => $data,
+                'user' => $user
+            ]);
         }
 
         // USER LOGIC
@@ -24,14 +35,21 @@ class DashboardController extends Controller
         $currentMonth = now()->startOfMonth()->format('Y-m-d');
         $currentBills = \App\Models\MonthlyBill::where('user_id', $user->id)
             ->where('month', $currentMonth)
+            ->with(['latestPayment'])
             ->get();
         
-        // 2. History (Bills excluding current month)
-        $historyBills = \App\Models\MonthlyBill::where('user_id', $user->id)
-            ->where('month', '<', $currentMonth)
-            ->latest('month')
+        // 2. History (Real Payment Transactions)
+        $paymentHistory = \App\Models\KasPayment::whereHas('bill', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->with(['bill'])
+            ->latest('payment_date')
             ->get();
 
-        return view('dashboard.user', compact('user', 'currentBills', 'historyBills'));
+        return Inertia::render('User/Dashboard', [
+            'user' => $user,
+            'currentBills' => $currentBills,
+            'paymentHistory' => $paymentHistory
+        ]);
     }
 }

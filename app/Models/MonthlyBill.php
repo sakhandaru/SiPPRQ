@@ -24,4 +24,9 @@ class MonthlyBill extends Model
     {
         return $this->hasMany(KasPayment::class, 'bill_id');
     }
+
+    public function latestPayment()
+    {
+        return $this->hasOne(KasPayment::class, 'bill_id')->latestOfMany();
+    }
 }

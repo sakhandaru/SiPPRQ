@@ -9,12 +9,18 @@ use App\Models\Balance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use Inertia\Inertia;
+
 class PaymentController extends Controller
 {
     public function index()
     {
         $payments = KasPayment::with('user')->latest()->paginate(15);
-        return view('admin.payments.index', compact('payments'));
+        return Inertia::render('Admin/Payments/Index', [
+            'payments' => $payments,
+            'success' => session('success'),
+            'error' => session('error'),
+        ]);
     }
 
     public function verify(Request $request, KasPayment $payment)

@@ -9,15 +9,7 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        // Get all bills for the user, ordered by month desc
-        $bills = \App\Models\MonthlyBill::where('user_id', auth()->id())
-            ->with(['payments' => function($q) {
-                $q->latest();
-            }])
-            ->latest('month')
-            ->get();
-            
-        return view('user.payments.index', compact('bills'));
+        return redirect()->route('dashboard');
     }
 
     public function store(Request $request)
@@ -33,8 +25,6 @@ class PaymentController extends Controller
             abort(403);
         }
         
-        // Prevent duplicate pending payments or paying already paid bills?
-        // Basic check: if bill is PAID, don't allow.
         if ($bill->status === 'PAID') {
             return back()->with('error', 'This bill is already paid.');
         }
@@ -50,6 +40,6 @@ class PaymentController extends Controller
             'status' => 'PENDING',
         ]);
 
-        return redirect()->route('user.payments.index')->with('success', 'Payment proof uploaded successfully.');
+        return redirect()->route('dashboard')->with('success', 'Payment proof uploaded successfully. Waiting for verification.');
     }
 }
