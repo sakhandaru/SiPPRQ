@@ -1,57 +1,34 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import Navbar from '@/Components/Landing/Navbar';
+import Hero from '@/Components/Landing/Hero';
+import About from '@/Components/Landing/About';
+import Programs from '@/Components/Landing/Programs';
+import Gallery from '@/Components/Landing/Gallery';
+import Footer from '@/Components/Landing/Footer';
 
 export default function Welcome({ auth }) {
     return (
         <>
-            <Head title="Welcome" />
-            <div className="min-h-screen bg-white flex flex-col justify-center items-center text-center p-4">
-                <div className="max-w-md w-full space-y-8">
-                    {/* LOGO Placeholder */}
-                    <div className="flex justify-center">
-                        <div className="h-16 w-16 bg-black rounded-xl flex items-center justify-center text-white font-bold text-2xl">
-                            S
-                        </div>
-                    </div>
+            <Head title="Pondok Pesantren Al-Hidayah" />
+            
+            <div className="font-sans text-gray-900 antialiased scroll-smooth">
+                {/* 1. NAVBAR */}
+                <Navbar auth={auth} />
 
-                    <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
-                        SiPPRQ v2
-                    </h1>
-                    <p className="mt-2 text-lg text-gray-500">
-                        Sistem Informasi Pengelolaan Pembayaran & Residents Asrama.
-                    </p>
+                {/* 2. HERO SECTION */}
+                <Hero />
 
-                    <div className="mt-8 flex justify-center gap-4">
-                        {auth.user ? (
-                            <div className="flex flex-col gap-4">
-                                <Link
-                                    href={route('dashboard')}
-                                    className="px-8 py-3 bg-black text-white text-base font-medium rounded-full hover:bg-gray-800 transition shadow-lg hover:shadow-xl"
-                                >
-                                    Go to Dashboard
-                                </Link>
-                                <Link
-                                    href={route('logout')}
-                                    method="post"
-                                    as="button"
-                                    className="text-red-600 hover:text-red-800 font-bold underline"
-                                >
-                                    Log Out
-                                </Link>
-                            </div>
-                        ) : (
-                            <Link
-                                href={route('login')}
-                                className="px-8 py-3 bg-black text-white text-base font-medium rounded-full hover:bg-gray-800 transition shadow-lg hover:shadow-xl"
-                            >
-                                Login System
-                            </Link>
-                        )}
-                    </div>
-                </div>
+                {/* 3. PROFILE / SAMBUTAN SECTION */}
+                <About />
 
-                <div className="mt-12 text-sm text-gray-400">
-                    &copy; 2026 SiPPRQ. All rights reserved.
-                </div>
+                {/* 4. PROGRAMS SECTION */}
+                <Programs />
+
+                {/* 5. GALLERY SECTION */}
+                <Gallery />
+
+                {/* 6. FOOTER */}
+                <Footer />
             </div>
         </>
     );
