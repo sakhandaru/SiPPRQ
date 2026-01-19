@@ -24,9 +24,17 @@ class DashboardController extends Controller
             $data['total_out'] = \App\Models\Cashflow::where('direction', 'OUT')->sum('amount');
             $data['total_out_fmt'] = number_format($data['total_out'], 0, ',', '.');
             
+            // LATEST DATA PREVIEWS
+            $latestResidents = \App\Models\User::where('role', 'USER')->latest()->take(5)->get();
+            $latestPayments = \App\Models\KasPayment::with('user')->where('status', 'VERIFIED')->latest('payment_date')->take(5)->get();
+            $latestCashflows = \App\Models\Cashflow::latest()->take(5)->get();
+
             return Inertia::render('Dashboard', [
                 'data' => $data,
-                'user' => $user
+                'user' => $user,
+                'latestResidents' => $latestResidents,
+                'latestPayments' => $latestPayments,
+                'latestCashflows' => $latestCashflows,
             ]);
         }
 

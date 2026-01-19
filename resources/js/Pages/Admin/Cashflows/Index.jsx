@@ -6,7 +6,7 @@ export default function Index({ cashflows, balance }) {
     const { success } = usePage().props;
     const [showModal, setShowModal] = useState(false);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset, transform } = useForm({
         direction: 'OUT',
         category: '',
         amount: '',
@@ -15,6 +15,12 @@ export default function Index({ cashflows, balance }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        transform((data) => ({
+            ...data,
+            amount: data.amount.toString().replace(/,/g, ''),
+        }));
+
         post(route('admin.cashflows.store'), {
             onSuccess: () => {
                 setShowModal(false);
@@ -145,14 +151,30 @@ export default function Index({ cashflows, balance }) {
                                 />
                                 {errors.category && <div className="text-red-500 text-xs mt-1">{errors.category}</div>}
                             </div>
-                             <div>
+                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Amount (Rp)</label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
                                     placeholder="0"
                                     value={data.amount}
-                                    onChange={e => setData('amount', e.target.value)}
+                                    onChange={(e) => {
+                                        let value = e.target.value.replace(/[^0-9]/g, '');
+                                        if (value) {
+                                            value = parseInt(value, 10).toLocaleString('id-ID'); // 'id-ID' uses dots, 'en-US' uses commas. User asked for commas? 
+                                            // The user said "koma" (comma) but "aplikasi keuangan pada umumnya". 
+                                            // In Indonesia, we use dots for thousands. 1.000.000. 
+                                            // Ideally I'd use 'id-ID'. But the user literally said 'koma' (comma).
+                                            // However, often users confuse the terms or mean standard English formatting.
+                                            // If I use 'en-US', it's 1,000,000.
+                                            // Let's stick to the safer bet: user asked for "koma" (comma), so I will use 'en-US' which produces commas.
+                                            // Wait, if the user account or app is Indonesian, maybe I should use dots?
+                                            // "otomatis kasih koma setelah 3 digit" -> "give comma after 3 digits". 1,000. 
+                                            // I will use commas.
+                                            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }
+                                        setData('amount', value);
+                                    }}
                                     required
                                 />
                                 {errors.amount && <div className="text-red-500 text-xs mt-1">{errors.amount}</div>}

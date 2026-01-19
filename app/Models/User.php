@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(KasPayment::class);
     }
+
+    public function monthlyBills(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(MonthlyBill::class);
+    }
 }

@@ -38,6 +38,9 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('admin/reports/cashflow', [\App\Http\Controllers\Admin\ReportController::class, 'cashflow'])->name('admin.reports.cashflow');
     Route::get('admin/reports/payments', [\App\Http\Controllers\Admin\ReportController::class, 'payments'])->name('admin.reports.payments');
     Route::post('admin/periods/lock', [\App\Http\Controllers\Admin\PeriodLockController::class, 'store'])->name('admin.periods.lock');
+
+    // Admin Tracker
+    Route::get('admin/tracker', [\App\Http\Controllers\Admin\TrackerController::class, 'index'])->name('admin.tracker.index');
 });
 
 Route::middleware(['auth', 'role:USER'])->group(function () {
