@@ -41,6 +41,7 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
 
     // Admin Tracker
     Route::get('admin/tracker', [\App\Http\Controllers\Admin\TrackerController::class, 'index'])->name('admin.tracker.index');
+    Route::post('admin/bills/generate', [\App\Http\Controllers\Admin\BillController::class, 'generate'])->name('admin.bills.generate');
 });
 
 Route::middleware(['auth', 'role:USER'])->group(function () {
@@ -50,6 +51,9 @@ Route::middleware(['auth', 'role:USER'])->group(function () {
     // User Payments
     Route::get('payments', [\App\Http\Controllers\User\PaymentController::class, 'index'])->name('user.payments.index');
     Route::post('payments', [\App\Http\Controllers\User\PaymentController::class, 'store'])->name('user.payments.store');
+    
+    // User Self-Service Bill
+    Route::post('bills', [\App\Http\Controllers\User\BillController::class, 'store'])->name('user.bills.store');
 });
 
 require __DIR__.'/auth.php';

@@ -1,70 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SiPPRQ v2.0 - Sistem Informasi Pembayaran Pondok
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem Pembayaran & Monitoring Berbasis Web untuk Pondok Pesantren.
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/Laravel-11-red) ![React](https://img.shields.io/badge/React-18-blue) ![Inertia](https://img.shields.io/badge/Inertia-2.0-purple)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Role: SANTRI (User)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Dashboard**: Melihat info tunggakan dan tagihan bulan berjalan dengan jelas.
+- **Pembayaran Borongan (Bulk Payment)**: Bayar banyak bulan sekaligus cukup dengan satu kali upload bukti transfer.
+- **Request Tagihan (Self-Service)**: Membuat tagihan untuk bulan depan (Bayar di Muka) secara mandiri.
+- **Riwayat Pembayaran**: Memantau status pembayaran yang sudah diajukan.
 
-## Learning Laravel
+### Role: ADMIN
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Dashboard Overview**: Ringkasan data Santri, Pembayaran Terbaru, dan Arus Kas.
+- **Payment Tracker**: Memantau santri yang BELUM BAYAR vs SUDAH BAYAR per bulan.
+- **Verifikasi Borongan**: Verifikasi pembayaran yang mencakup banyak tagihan sekaligus.
+- **Penagihan Otomatis**: Sistem otomatis membuat tagihan setiap **tanggal 1** awal bulan.
+- **Laporan Keuangan**: Export laporan Arus Kas (Cashflow) dan Pembayaran.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi & Setup
 
-## Laravel Sponsors
+1. **Clone & Install**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    ```bash
+    git clone ...
+    composer install
+    npm install
+    ```
 
-### Premium Partners
+2. **Environment**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-## Contributing
+3. **Database**
+   Atur koneksi database di file `.env`, lalu jalankan:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```bash
+    php artisan migrate --seed
+    ```
 
-## Code of Conduct
+4. **Penjadwal Tagihan (Scheduler)**
+   Agar tagihan otomatis muncul tiap bulan, pastikan scheduler aktif di server:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    ```bash
+    * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
+    ```
 
-## Security Vulnerabilities
+5. **Jalankan Lokal**
+    ```bash
+    npm run dev
+    php artisan serve
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Alur Kerja Utama
 
-## License
+### 1. Pembuatan Tagihan Otomatis
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Berjalan otomatis setiap tanggal 1. Sistem akan membuatkan tagihan untuk semua santri aktif yang belum memiliki tagihan di bulan tersebut.
 
+### 2. Buat Tagihan Manual (Admin Backup)
 
-kurang: (belum urut)
+Jika perlu, Admin bisa memaksa pembuatan tagihan untuk bulan tertentu lewat menu **Admin Tracker > Generate Bill**.
 
-- dashboard user harus ada keterangan terbayar atau kurang sampai bulan apa
-- bisa bayar beberapa bulan sekaligus
+### 3. Pembayaran Borongan
 
-
-- tracker untuk yang belum bayar
-- hapus blade blade tidak berguna
-- overview untuk admin isinya preview
+Santri bisa memilih banyak tagihan di dashboard dan mengupload satu bukti bayar. Admin cukup validasi sekali, dan semua tagihan yang dipilih akan lunas.

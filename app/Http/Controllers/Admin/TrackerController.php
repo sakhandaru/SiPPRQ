@@ -25,7 +25,7 @@ class TrackerController extends Controller
                 $query->where('month', $targetMonth); 
             }, 'monthlyBills.latestPayment'])
             ->get()
-            ->map(function ($user) {
+            ->map(function ($user) use ($targetMonth) {
                 // Determine KAS Bill Status
                 $kasBill = $user->monthlyBills->firstWhere('type', 'KAS');
                 
@@ -47,8 +47,11 @@ class TrackerController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'phone' => $user->phone,
                     'status' => $status,
-                    'payment_id' => $paymentId
+                    'payment_id' => $paymentId,
+                    'bill_amount' => $kasBill ? $kasBill->amount : 0,
+                    'bill_month_name' => \Carbon\Carbon::parse($targetMonth)->translatedFormat('F Y'),
                 ];
             });
 

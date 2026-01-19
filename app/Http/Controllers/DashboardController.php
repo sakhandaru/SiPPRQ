@@ -39,11 +39,16 @@ class DashboardController extends Controller
         }
 
         // USER LOGIC
-        // 1. Current Month Bills
+        // 1. My Bills (Unpaid Past Bills + Current Month)
         $currentMonth = now()->startOfMonth()->format('Y-m-d');
-        $currentBills = \App\Models\MonthlyBill::where('user_id', $user->id)
-            ->where('month', $currentMonth)
+        
+        $bills = \App\Models\MonthlyBill::where('user_id', $user->id)
+            ->where(function($q) use ($currentMonth) {
+                $q->where('status', '!=', 'PAID')
+                  ->orWhere('month', $currentMonth);
+            })
             ->with(['latestPayment'])
+            ->orderBy('month', 'desc')
             ->get();
         
         // 2. History (Real Payment Transactions)
@@ -56,7 +61,7 @@ class DashboardController extends Controller
 
         return Inertia::render('User/Dashboard', [
             'user' => $user,
-            'currentBills' => $currentBills,
+            'bills' => $bills,
             'paymentHistory' => $paymentHistory
         ]);
     }
