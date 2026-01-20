@@ -28,4 +28,29 @@ class BillController extends Controller
 
         return back()->with('success', "Generate Bill for {$monthName} success! ({$result['users_count']} users processed)");
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'amount' => 'required|integer|min:1',
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $count = 0;
+        foreach ($request->user_ids as $userId) {
+            \App\Models\Bill::create([
+                'user_id' => $userId,
+                'type' => 'INCIDENTAL', // Manual incidental bill
+                'title' => $request->title,
+                'amount' => $request->amount,
+                'status' => 'UNPAID',
+                'month' => now(), // Default to current date for incidental
+            ]);
+            $count++;
+        }
+
+        return back()->with('success', "Created incidental bill '{$request->title}' for {$count} users.");
+    }
 }

@@ -21,13 +21,13 @@ class TrackerController extends Controller
         $users = User::where('role', 'USER')
             ->where('status', 'AKTIF')
             ->orderBy('name')
-            ->with(['monthlyBills' => function ($query) use ($targetMonth) {
+            ->with(['bills' => function ($query) use ($targetMonth) {
                 $query->where('month', $targetMonth); 
-            }, 'monthlyBills.latestPayment'])
+            }, 'bills.latestPayment'])
             ->get()
             ->map(function ($user) use ($targetMonth) {
                 // Determine KAS Bill Status
-                $kasBill = $user->monthlyBills->firstWhere('type', 'KAS');
+                $kasBill = $user->bills->firstWhere('type', 'KAS');
                 
                 $status = 'NO_BILL';
                 $paymentId = null;

@@ -42,7 +42,7 @@ class DashboardController extends Controller
         // 1. My Bills (Unpaid Past Bills + Current Month)
         $currentMonth = now()->startOfMonth()->format('Y-m-d');
         
-        $bills = \App\Models\MonthlyBill::where('user_id', $user->id)
+        $bills = \App\Models\Bill::where('user_id', $user->id)
             ->where(function($q) use ($currentMonth) {
                 $q->where('status', '!=', 'PAID')
                   ->orWhere('month', $currentMonth);

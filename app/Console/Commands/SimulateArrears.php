@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\MonthlyBill;
+use App\Models\Bill;
 use App\Models\KasPayment;
 use App\Models\User;
 use App\Models\FeeSetting;
@@ -33,11 +33,11 @@ class SimulateArrears extends Command
             return;
         }
 
-        $this->info('Truncating MonthlyBills and KasPayments...');
+        $this->info('Truncating Bills and KasPayments...');
         
         \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
         KasPayment::truncate(); 
-        MonthlyBill::truncate();
+        Bill::truncate();
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
         $users = User::where('role', 'USER')->where('status', 'AKTIF')->get();
@@ -57,7 +57,7 @@ class SimulateArrears extends Command
             foreach ($months as $month) {
                 // 1. KAS Bill
                 if (isset($fees['KAS'])) {
-                    MonthlyBill::create([
+                    Bill::create([
                         'user_id' => $user->id,
                         'type' => 'KAS',
                         'month' => $month,
@@ -69,7 +69,7 @@ class SimulateArrears extends Command
 
                 // 2. WIFI Bill
                 if (isset($fees['WIFI'])) {
-                    MonthlyBill::create([
+                    Bill::create([
                         'user_id' => $user->id,
                         'type' => 'WIFI',
                         'month' => $month,

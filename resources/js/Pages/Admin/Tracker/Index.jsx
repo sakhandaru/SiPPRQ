@@ -9,10 +9,37 @@ export default function Index({ auth, users, stats, filters }) {
 
     // Generate Bill Form
     const [showGenerateModal, setShowGenerateModal] = useState(false);
+    const [billType, setBillType] = useState('MONTHLY'); // MONTHLY or MANUAL
+    
+    // Monthly Form
     const { data: genData, setData: setGenData, post: postGen, processing: genProcessing, reset: resetGen } = useForm({
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 2 > 12 ? 1 : new Date().getMonth() + 2, // Default to next month
     });
+
+    // Manual Form
+    const { data: manualData, setData: setManualData, post: postManual, processing: manualProcessing, reset: resetManual } = useForm({
+        title: '',
+        amount: '',
+        user_ids: [],
+    });
+
+    // Helper for manual selection
+    const toggleUser = (id) => {
+        if (manualData.user_ids.includes(id)) {
+            setManualData('user_ids', manualData.user_ids.filter(uid => uid !== id));
+        } else {
+            setManualData('user_ids', [...manualData.user_ids, id]);
+        }
+    };
+    
+    const selectAllUsers = (e) => {
+        if (e.target.checked) {
+            setManualData('user_ids', users.map(u => u.id));
+        } else {
+            setManualData('user_ids', []);
+        }
+    }
 
     const handleFilter = () => {
         router.get(route('admin.tracker.index'), { year, month, status }, { preserveState: true });
@@ -20,12 +47,28 @@ export default function Index({ auth, users, stats, filters }) {
 
     const handleGenerate = (e) => {
         e.preventDefault();
-        postGen(route('admin.bills.generate'), {
-            onSuccess: () => {
-                setShowGenerateModal(false);
-                resetGen();
-            }
-        });
+        if (billType === 'MONTHLY') {
+            postGen(route('admin.bills.generate'), {
+                onSuccess: () => {
+                    setShowGenerateModal(false);
+                    resetGen();
+                }
+            });
+        } else {
+            // Clean amount
+            const dataToSubmit = {
+                ...manualData,
+                amount: manualData.amount.toString().replace(/,/g, ''),
+            };
+            
+             router.post(route('admin.bills.store'), dataToSubmit, {
+                onSuccess: () => {
+                    setShowGenerateModal(false);
+                    resetManual();
+                },
+                preserveScroll: true
+             });
+        }
     };
 
     const months = [
@@ -42,44 +85,134 @@ export default function Index({ auth, users, stats, filters }) {
             {/* GENERATE MODAL */}
             {showGenerateModal && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md p-6">
-                        <h3 className="text-lg font-bold mb-4">Generate Monthly Bill</h3>
+                    <div className="bg-white rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-bold">Create Bill</h3>
+                            <button onClick={() => setShowGenerateModal(false)} className="text-gray-400 hover:text-black">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        
+                        {/* TABS */}
+                        <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+                            <button 
+                                onClick={() => setBillType('MONTHLY')}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition ${billType === 'MONTHLY' ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Monthly Routine
+                            </button>
+                            <button 
+                                onClick={() => setBillType('MANUAL')}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition ${billType === 'MANUAL' ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Incidental / Manual
+                            </button>
+                        </div>
+
                         <form onSubmit={handleGenerate} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Year</label>
-                                <input 
-                                    type="number" 
-                                    value={genData.year} 
-                                    onChange={e => setGenData('year', e.target.value)}
-                                    className="w-full rounded-xl border-gray-300 focus:border-black focus:ring-black"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Month</label>
-                                <select 
-                                    value={genData.month}
-                                    onChange={e => setGenData('month', e.target.value)}
-                                    className="w-full rounded-xl border-gray-300 focus:border-black focus:ring-black"
-                                >
-                                    {months.map(m => (
-                                        <option key={m.id} value={m.id}>{m.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="flex gap-3 mt-6">
+                            {billType === 'MONTHLY' ? (
+                                <>
+                                    <div className="bg-blue-50 p-4 rounded-xl text-blue-700 text-sm mb-4">
+                                        Generates standard monthly bills for all active residents. 
+                                        Checks logic for existing bills to avoid duplicates.
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Year</label>
+                                        <input 
+                                            type="number" 
+                                            value={genData.year} 
+                                            onChange={e => setGenData('year', e.target.value)}
+                                            className="w-full rounded-xl border-gray-300 focus:border-black focus:ring-black"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Month</label>
+                                        <select 
+                                            value={genData.month}
+                                            onChange={e => setGenData('month', e.target.value)}
+                                            className="w-full rounded-xl border-gray-300 focus:border-black focus:ring-black"
+                                        >
+                                            {months.map(m => (
+                                                <option key={m.id} value={m.id}>{m.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
+                                        <input 
+                                            type="text" 
+                                            value={manualData.title} 
+                                            placeholder="e.g. Iuran Rekreasi, Denda, etc."
+                                            onChange={e => setManualData('title', e.target.value)}
+                                            className="w-full rounded-xl border-gray-300 focus:border-black focus:ring-black"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1">Amount (Rp)</label>
+                                        <input 
+                                            type="text" 
+                                            value={manualData.amount} 
+                                            placeholder="0"
+                                            onChange={(e) => {
+                                                let value = e.target.value.replace(/[^0-9]/g, '');
+                                                if (value) value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                setManualData('amount', value);
+                                            }}
+                                            className="w-full rounded-xl border-gray-300 focus:border-black focus:ring-black"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <label className="block text-sm font-bold text-gray-700">Select Residents</label>
+                                            <label className="flex items-center text-xs text-blue-600 cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    onChange={selectAllUsers}
+                                                    checked={manualData.user_ids.length === users.length && users.length > 0}
+                                                    className="mr-1 rounded border-gray-300"
+                                                />
+                                                Select All
+                                            </label>
+                                        </div>
+                                        <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-xl p-2 space-y-1">
+                                            {users.map(u => (
+                                                <label key={u.id} className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        checked={manualData.user_ids.includes(u.id)}
+                                                        onChange={() => toggleUser(u.id)}
+                                                        className="rounded border-gray-300 text-black focus:ring-black mr-2"
+                                                    />
+                                                    <span className="text-sm">{u.name}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                        <div className="text-xs text-gray-400 mt-1 text-right">
+                                            {manualData.user_ids.length} selected
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="flex gap-3 mt-6 pt-4 border-t border-gray-100">
                                 <button 
                                     type="button" 
                                     onClick={() => setShowGenerateModal(false)}
-                                    className="flex-1 py-2 bg-gray-100 rounded-xl font-bold hover:bg-gray-200"
+                                    className="flex-1 py-3 bg-gray-100 rounded-xl font-bold hover:bg-gray-200 transition"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit" 
-                                    disabled={genProcessing}
-                                    className="flex-1 py-2 bg-black text-white rounded-xl font-bold hover:bg-gray-800 disabled:opacity-50"
+                                    disabled={genProcessing || manualProcessing}
+                                    className="flex-1 py-3 bg-black text-white rounded-xl font-bold hover:bg-gray-800 disabled:opacity-50 transition"
                                 >
-                                    {genProcessing ? 'Generating...' : 'Generate'}
+                                    {genProcessing || manualProcessing ? 'Processing...' : (billType === 'MONTHLY' ? 'Generate Monthly' : 'Create Bill')}
                                 </button>
                             </div>
                         </form>

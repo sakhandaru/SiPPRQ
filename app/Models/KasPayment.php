@@ -25,7 +25,7 @@ class KasPayment extends Model
 
     public function bill()
     {
-        return $this->belongsTo(MonthlyBill::class, 'bill_id');
+        return $this->belongsTo(Bill::class, 'bill_id');
     }
 
     public function verifier()

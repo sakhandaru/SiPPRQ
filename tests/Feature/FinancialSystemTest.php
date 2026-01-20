@@ -4,7 +4,7 @@ use App\Models\User;
 use App\Models\KasPayment;
 use App\Models\Balance;
 use App\Models\Cashflow;
-use App\Models\MonthlyBill;
+use App\Models\Bill;
 use App\Models\FeeSetting;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -20,14 +20,14 @@ test('system can generate monthly bills', function () {
     Artisan::call('bill:generate');
 
     // 3. Assert Bills Created
-    $this->assertDatabaseHas('monthly_bills', [
+    $this->assertDatabaseHas('bills', [
         'user_id' => $user->id,
         'type' => 'KAS',
         'amount' => 125000,
         'status' => 'UNPAID',
     ]);
     
-    $this->assertDatabaseHas('monthly_bills', [
+    $this->assertDatabaseHas('bills', [
         'user_id' => $user->id,
         'type' => 'WIFI',
         'amount' => 30000,
@@ -38,7 +38,7 @@ test('system can generate monthly bills', function () {
 test('user can upload payment proof for a bill', function () {
     Storage::fake('public');
     $user = User::factory()->create(['role' => 'USER']);
-    $bill = MonthlyBill::create([
+    $bill = Bill::create([
         'user_id' => $user->id,
         'type' => 'KAS',
         'month' => now()->startOfMonth(),
@@ -67,7 +67,7 @@ test('admin can verify payment and it updates bill and balance', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $user = User::factory()->create(['role' => 'USER']);
     
-    $bill = MonthlyBill::create([
+    $bill = Bill::create([
         'user_id' => $user->id,
         'type' => 'KAS',
         'month' => now()->startOfMonth(),
@@ -95,7 +95,7 @@ test('admin can verify payment and it updates bill and balance', function () {
     ]);
 
     // Check Bill Updated
-    $this->assertDatabaseHas('monthly_bills', [
+    $this->assertDatabaseHas('bills', [
         'id' => $bill->id,
         'status' => 'PAID',
     ]);
@@ -128,7 +128,7 @@ test('admin can create manual expense and it decreases balance', function () {
 test('user cannot access admin payment verification', function () {
     $user = User::factory()->create(['role' => 'USER']);
     // Setup dummy bill/payment to try
-    $bill = MonthlyBill::create(['user_id'=>$user->id, 'type'=>'KAS', 'month'=>now(), 'amount'=>1, 'status'=>'UNPAID']);
+    $bill = Bill::create(['user_id'=>$user->id, 'type'=>'KAS', 'month'=>now(), 'amount'=>1, 'status'=>'UNPAID']);
     $payment = KasPayment::create([
         'user_id' => $user->id,
         'bill_id' => $bill->id,

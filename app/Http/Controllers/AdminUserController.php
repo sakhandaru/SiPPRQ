@@ -43,9 +43,16 @@ class AdminUserController extends Controller
             'status' => 'required|in:AKTIF,NONAKTIF,ALUMNI',
             'phone' => 'nullable|string',
             // Profile fields
+            // Profile fields
             'wali_nama' => 'required_if:role,USER|string|nullable',
             'wali_kontak' => 'required_if:role,USER|string|nullable',
-            'alamat_asal' => 'required_if:role,USER|string|nullable',
+            'province_id' => 'required_if:role,USER|exists:provinces,id|nullable',
+            'city_id' => 'required_if:role,USER|exists:cities,id|nullable',
+            'district_id' => 'required_if:role,USER|exists:districts,id|nullable',
+            'address_detail' => 'required_if:role,USER|string|nullable',
+            'birth_date' => 'required_if:role,USER|date|nullable',
+            'study_program' => 'required_if:role,USER|string|nullable',
+            'student_id_number' => 'required_if:role,USER|string|nullable',
             'pendidikan' => 'required_if:role,USER|in:SMP,SMA,KULIAH|nullable',
             'institusi' => 'nullable|string',
             'tahun_masuk' => 'required_if:role,USER|integer|nullable',
@@ -65,7 +72,13 @@ class AdminUserController extends Controller
             $user->residentProfile()->create([
                 'wali_nama' => $validated['wali_nama'],
                 'wali_kontak' => $validated['wali_kontak'],
-                'alamat_asal' => $validated['alamat_asal'],
+                'province_id' => $validated['province_id'] ?? null,
+                'city_id' => $validated['city_id'] ?? null,
+                'district_id' => $validated['district_id'] ?? null,
+                'address_detail' => $validated['address_detail'] ?? null,
+                'birth_date' => $validated['birth_date'] ?? null,
+                'study_program' => $validated['study_program'] ?? null,
+                'student_id_number' => $validated['student_id_number'] ?? null,
                 'pendidikan' => $validated['pendidikan'],
                 'institusi' => $validated['institusi'] ?? null,
                 'tahun_masuk' => $validated['tahun_masuk'],
@@ -100,7 +113,13 @@ class AdminUserController extends Controller
              // Profile fields
             'wali_nama' => 'nullable|required_if:role,USER|string',
             'wali_kontak' => 'nullable|required_if:role,USER|string',
-            'alamat_asal' => 'nullable|required_if:role,USER|string',
+            'province_id' => 'exists:provinces,id|nullable',
+            'city_id' => 'exists:cities,id|nullable',
+            'district_id' => 'exists:districts,id|nullable',
+            'address_detail' => 'nullable|string',
+            'birth_date' => 'nullable|date',
+            'study_program' => 'nullable|string',
+            'student_id_number' => 'nullable|string',
             'pendidikan' => 'nullable|required_if:role,USER|in:SMP,SMA,KULIAH',
             'institusi' => 'nullable|string',
             'tahun_masuk' => 'nullable|required_if:role,USER|integer',
@@ -118,8 +137,9 @@ class AdminUserController extends Controller
             $user->residentProfile()->updateOrCreate(
                 ['user_id' => $user->id],
                 $request->only([
-                    'wali_nama', 'wali_kontak', 'alamat_asal', 'pendidikan', 
-                    'institusi', 'tahun_masuk', 'tahun_keluar', 
+                    'wali_nama', 'wali_kontak', 'province_id', 'city_id', 'district_id', 'address_detail',
+                     'birth_date', 'study_program', 'student_id_number',
+                     'pendidikan', 'institusi', 'tahun_masuk', 'tahun_keluar', 
                     'social_instagram', 'social_facebook', 'social_linkedin'
                 ])
             );

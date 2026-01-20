@@ -14,6 +14,7 @@ class Cashflow extends Model
         'amount',
         'description',
         'created_by',
+        'proof_file_path',
     ];
 
     public function creator()

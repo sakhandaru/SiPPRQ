@@ -31,9 +31,16 @@ class CashflowController extends Controller
             'category' => 'required|string|max:255',
             'amount' => 'required|integer|min:1',
             'description' => 'nullable|string',
+            'proof_file' => 'required|image|max:2048', // Enforce proof for manual transactions
         ]);
 
         DB::transaction(function () use ($request) {
+            // Handle File Upload
+            $path = null;
+            if ($request->hasFile('proof_file')) {
+                $path = $request->file('proof_file')->store('cashflow-proofs', 'public');
+            }
+
             // 1. Create Cashflow
             $cashflow = Cashflow::create([
                 'source_type' => 'MANUAL',
@@ -42,6 +49,7 @@ class CashflowController extends Controller
                 'amount' => $request->amount,
                 'description' => $request->description,
                 'created_by' => auth()->id(),
+                'proof_file_path' => $path,
             ]);
 
             // 2. Update Balance

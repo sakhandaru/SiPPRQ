@@ -16,7 +16,7 @@ class PaymentController extends Controller
     {
         $request->validate([
             'bill_ids' => 'required|array',
-            'bill_ids.*' => 'exists:monthly_bills,id',
+            'bill_ids.*' => 'exists:bills,id',
             'proof_image' => 'required|image|max:2048', // 2MB Max
         ]);
 
@@ -24,7 +24,7 @@ class PaymentController extends Controller
         $count = 0;
 
         foreach ($request->bill_ids as $billId) {
-            $bill = \App\Models\MonthlyBill::findOrFail($billId);
+            $bill = \App\Models\Bill::findOrFail($billId);
 
             if ($bill->user_id !== auth()->id()) {
                 continue; // Skip if not owner

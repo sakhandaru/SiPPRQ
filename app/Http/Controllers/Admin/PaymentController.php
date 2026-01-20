@@ -51,7 +51,7 @@ class PaymentController extends Controller
 
             // 2. Update Bill Status (if linked)
             if ($payment->bill_id) {
-                // Assuming MonthlyBill model exists and linked
+                // Assuming Bill model exists and linked
                 $payment->bill()->update([
                     'status' => 'PAID',
                     'paid_at' => now(),

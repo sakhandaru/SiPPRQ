@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\FeeSetting;
-use App\Models\MonthlyBill;
+use App\Models\Bill;
 use Carbon\Carbon;
 
 class BillService
@@ -41,7 +41,7 @@ class BillService
 
         // 1. KAS Bill
         if (isset($fees['KAS'])) {
-            $bill = MonthlyBill::firstOrCreate(
+            $bill = Bill::firstOrCreate(
                 [
                     'user_id' => $user->id,
                     'type' => 'KAS',
@@ -57,7 +57,7 @@ class BillService
 
         // 2. WIFI Bill
         if (isset($fees['WIFI'])) {
-            $bill = MonthlyBill::firstOrCreate(
+            $bill = Bill::firstOrCreate(
                 [
                     'user_id' => $user->id,
                     'type' => 'WIFI',

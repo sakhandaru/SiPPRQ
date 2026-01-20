@@ -42,6 +42,12 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     // Admin Tracker
     Route::get('admin/tracker', [\App\Http\Controllers\Admin\TrackerController::class, 'index'])->name('admin.tracker.index');
     Route::post('admin/bills/generate', [\App\Http\Controllers\Admin\BillController::class, 'generate'])->name('admin.bills.generate');
+    Route::post('admin/bills/store', [\App\Http\Controllers\Admin\BillController::class, 'store'])->name('admin.bills.store');
+    
+    // API Regions (Session Authenticated)
+    Route::get('api/provinces', [\App\Http\Controllers\Api\RegionController::class, 'provinces'])->name('api.regions.provinces');
+    Route::get('api/provinces/{province}/cities', [\App\Http\Controllers\Api\RegionController::class, 'cities'])->name('api.regions.cities');
+    Route::get('api/cities/{city}/districts', [\App\Http\Controllers\Api\RegionController::class, 'districts'])->name('api.regions.districts');
 });
 
 Route::middleware(['auth', 'role:USER'])->group(function () {

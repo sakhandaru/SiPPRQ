@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MonthlyBill extends Model
+class Bill extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected $table = 'bills';
     protected $fillable = [
         'user_id',
         'type',
+        'title',
         'month',
         'amount',
         'status',

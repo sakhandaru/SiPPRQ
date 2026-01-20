@@ -5,14 +5,16 @@ import { useState } from 'react';
 export default function Index({ cashflows, balance }) {
     const { success } = usePage().props;
     const [showModal, setShowModal] = useState(false);
+    const [proofUrl, setProofUrl] = useState(null);
 
     const { data, setData, post, processing, errors, reset, transform } = useForm({
         direction: 'OUT',
         category: '',
         amount: '',
         description: '',
+        proof_file: null,
     });
-
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         
@@ -31,40 +33,27 @@ export default function Index({ cashflows, balance }) {
 
     return (
         <AdminLayout title="Cashflow Management">
-            <Head title="Cashflows" />
-
-            {/* HEADER STATS & ACTION */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                <div className="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100 flex items-center">
-                    <div className="mr-4 p-3 bg-purple-50 rounded-xl text-purple-600">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <div>
-                        <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">Current Balance</div>
-                        <div className="text-2xl font-extrabold text-gray-900">
-                             Rp {new Intl.NumberFormat('id-ID').format(balance.current_balance)}
-                        </div>
-                    </div>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Cashflow</h1>
+                    <p className="text-gray-500 text-sm mt-1">Manage income and expenses.</p>
                 </div>
-
-                <button
+                <button 
                     onClick={() => setShowModal(true)}
-                    className="bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg hover:shadow-xl flex items-center"
+                    className="bg-black text-white px-6 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center"
                 >
-                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     Record Transaction
                 </button>
             </div>
 
-            {/* SUCCESS MESSAGE */}
-            {success && (
-                <div className="mb-6 bg-green-50 text-green-700 p-4 rounded-xl border border-green-100 flex items-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                     {success}
+            {/* BALANCE CARD */}
+            <div className="mb-8">
+                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 inline-block min-w-[250px]">
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Current Balance (Saldo)</p>
+                    <p className="text-3xl font-black text-gray-900 mt-2">Rp {balance ? balance.current_balance.toLocaleString('id-ID') : 0}</p>
                 </div>
-            )}
-
-            {/* TABLE */}
+            </div>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-left text-sm text-gray-500">
                     <thead className="bg-gray-50 text-xs uppercase text-gray-400 font-bold tracking-wider">
@@ -74,6 +63,7 @@ export default function Index({ cashflows, balance }) {
                             <th className="px-6 py-4">Category</th>
                             <th className="px-6 py-4">Description</th>
                             <th className="px-6 py-4">Amount</th>
+                            <th className="px-6 py-4">Proof</th>
                             <th className="px-6 py-4">Creator</th>
                         </tr>
                     </thead>
@@ -100,6 +90,18 @@ export default function Index({ cashflows, balance }) {
                                 <td className={`px-6 py-4 font-bold ${flow.direction === 'IN' ? 'text-emerald-600' : 'text-red-600'}`}>
                                     {flow.direction === 'IN' ? '+' : '-'} Rp {flow.amount.toLocaleString()}
                                 </td>
+                                <td className="px-6 py-4">
+                                    {flow.proof_file_path ? (
+                                        <button 
+                                            onClick={() => setProofUrl(`/storage/${flow.proof_file_path}`)}
+                                            className="text-blue-600 hover:text-blue-800 text-xs font-bold border border-blue-200 rounded px-2 py-1 bg-blue-50"
+                                        >
+                                            View
+                                        </button>
+                                    ) : (
+                                        <span className="text-gray-300 text-xs text-center block">-</span>
+                                    )}
+                                </td>
                                 <td className="px-6 py-4 text-xs text-gray-400">
                                     {flow.creator ? flow.creator.name : 'System'}
                                 </td>
@@ -120,7 +122,17 @@ export default function Index({ cashflows, balance }) {
                 </div>
             </div>
 
-            {/* MODAL */}
+            {/* PROOF MODAL */}
+            {proofUrl && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4" onClick={() => setProofUrl(null)}>
+                     <div className="relative max-w-4xl max-h-screen">
+                        <img src={proofUrl} alt="Proof" className="max-w-full max-h-[90vh] rounded-lg shadow-2xl" />
+                        <button className="absolute -top-10 right-0 text-white hover:text-gray-300 text-sm font-bold">CLOSE [X]</button>
+                     </div>
+                </div>
+            )}
+
+            {/* TRANSACTION MODAL */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
                     <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in-up">
@@ -141,14 +153,20 @@ export default function Index({ cashflows, balance }) {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                <input
-                                    type="text"
+                                <select
                                     className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    placeholder="e.g. WiFi Bill, Donation, Maintenance"
                                     value={data.category}
                                     onChange={e => setData('category', e.target.value)}
                                     required
-                                />
+                                >
+                                    <option value="">Select Category</option>
+                                    <option value="OPERATIONAL">Operational (Listrik/Air/Wifi)</option>
+                                    <option value="CONSTRUCTION">Pembangunan & Renovasi</option>
+                                    <option value="ACTIVITY">Kegiatan Santri</option>
+                                    <option value="CONSUMPTION">Konsumsi</option>
+                                    <option value="MAINTENANCE">Maintenance & Perbaikan</option>
+                                    <option value="OTHER">Lainnya</option>
+                                </select>
                                 {errors.category && <div className="text-red-500 text-xs mt-1">{errors.category}</div>}
                             </div>
                             <div>
@@ -161,16 +179,6 @@ export default function Index({ cashflows, balance }) {
                                     onChange={(e) => {
                                         let value = e.target.value.replace(/[^0-9]/g, '');
                                         if (value) {
-                                            value = parseInt(value, 10).toLocaleString('id-ID'); // 'id-ID' uses dots, 'en-US' uses commas. User asked for commas? 
-                                            // The user said "koma" (comma) but "aplikasi keuangan pada umumnya". 
-                                            // In Indonesia, we use dots for thousands. 1.000.000. 
-                                            // Ideally I'd use 'id-ID'. But the user literally said 'koma' (comma).
-                                            // However, often users confuse the terms or mean standard English formatting.
-                                            // If I use 'en-US', it's 1,000,000.
-                                            // Let's stick to the safer bet: user asked for "koma" (comma), so I will use 'en-US' which produces commas.
-                                            // Wait, if the user account or app is Indonesian, maybe I should use dots?
-                                            // "otomatis kasih koma setelah 3 digit" -> "give comma after 3 digits". 1,000. 
-                                            // I will use commas.
                                             value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                         }
                                         setData('amount', value);
@@ -188,6 +196,17 @@ export default function Index({ cashflows, balance }) {
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
                                 ></textarea>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Proof (Bukti/Nota)</label>
+                                <input 
+                                    type="file" 
+                                    accept="image/*"
+                                    className="w-full p-2 border border-gray-200 rounded-xl"
+                                    onChange={e => setData('proof_file', e.target.files[0])}
+                                    required
+                                />
+                                {errors.proof_file && <div className="text-red-500 text-xs mt-1">{errors.proof_file}</div>}
                             </div>
                             
                             <div className="flex gap-3 pt-4">
