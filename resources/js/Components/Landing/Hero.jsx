@@ -11,25 +11,25 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80"></div>
             </div>
 
-            <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white space-y-8 animate-fade-in-up">
+            <div className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 text-left text-white space-y-8 animate-fade-in-up">
                 <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium tracking-wide uppercase text-green-300 mb-2">
                     Membangun Generasi Qur'ani
                 </div>
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight max-w-4xl">
                     Menjaga Tradisi,<br/>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-500">
                         Merawat Masa Depan
                     </span>
                 </h1>
-                <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
-                    Selamat datang di Portal Resmi Pondok Pesantren Al-Hidayah. Pusat pendidikan Islam yang memadukan kurikulum salaf dan modern untuk mencetak santri berakhlakul karimah.
+                <p className="text-lg md:text-xl text-gray-200 max-w-2xl leading-relaxed">
+                    Selamat datang di Portal Resmi PP. Raudhatul Qur'an Annasimiyyah. Pusat pendidikan Islam yang memadukan kurikulum salaf dan modern untuk mencetak santri berakhlakul karimah.
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                    <a href="#profil" className="px-8 py-4 bg-green-600 text-white font-bold rounded-full hover:bg-green-700 transition shadow-xl hover:shadow-green-500/30 transform hover:-translate-y-1">
+                <div className="flex flex-col sm:flex-row gap-4 justify-start pt-4">
+                    <a href="#profil" className="px-8 py-4 bg-green-600 text-white font-bold rounded-full hover:bg-green-700 transition shadow-xl hover:shadow-green-500/30 transform hover:-translate-y-1 text-center">
                         Selengkapnya
                     </a>
-                    <a href="#kontak" className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white hover:text-green-900 transition shadow-xl transform hover:-translate-y-1">
+                    <a href="#kontak" className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white hover:text-green-900 transition shadow-xl transform hover:-translate-y-1 text-center">
                         Info Pendaftaran
                     </a>
                 </div>

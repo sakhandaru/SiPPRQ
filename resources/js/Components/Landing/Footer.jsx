@@ -7,8 +7,8 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                     <div>
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">A</div>
-                            <div className="font-bold text-xl">PP. Al-Hidayah</div>
+                            <img src="/logoRQkecil.png" alt="Logo" className="w-12 h-12 object-contain bg-white rounded-full p-1" />
+                            <div className="font-bold text-xl">PP. Raudhatul Qur'an<br/>Annasimiyyah</div>
                         </div>
                         <p className="text-gray-400 leading-relaxed">
                             Mewujudkan generasi santri yang intelek, religius, dan berwawasan global dengan tetap memegang teguh nilai-nilai Ahlussunnah wal Jama'ah.
@@ -37,7 +37,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="border-t border-gray-800 mt-16 pt-8 text-center text-gray-500 text-sm">
-                    &copy; 2026 Pondok Pesantren Al-Hidayah. All rights reserved. System powered by SiPPRQ.
+                    &copy; 2026 PP. Raudhatul Qur'an Annasimiyyah. All rights reserved. System powered by SiPPRQ.
                 </div>
             </div>
         </footer>

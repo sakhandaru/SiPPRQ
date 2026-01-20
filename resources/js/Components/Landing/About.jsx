@@ -19,28 +19,18 @@ export default function About() {
 
                     {/* Text Content */}
                     <div className="space-y-6">
-                        <h3 className="text-green-600 font-bold uppercase tracking-wider text-sm">Tentang Pondok</h3>
+                        <h3 className="text-green-600 font-bold uppercase tracking-wider text-sm">Sejarah Pondok</h3>
                         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight font-serif">
-                            Mendidik dengan Hati,<br/>
-                            Mengabdi untuk Ummat.
+                            Dari Kauman untuk<br/>
+                            Generasi Qur'ani.
                         </h2>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            Pondok Pesantren Al-Hidayah berdiri sejak tahun 1990 dengan visi mencetak generasi santri yang tidak hanya hafal Al-Qur'an, tetapi juga memiliki kedalaman ilmu agama (Tafaqquh Fiddin) dan siap berkontribusi di masyarakat modern.
-                        </p>
-                        
-                        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
-                            <div>
-                                <div className="text-3xl font-black text-green-600">30+</div>
-                                <div className="text-sm text-gray-500 font-medium">Tahun Mengabdi</div>
-                            </div>
-                            <div>
-                                <div className="text-3xl font-black text-green-600">500+</div>
-                                <div className="text-sm text-gray-500 font-medium">Santri Aktif</div>
-                            </div>
-                            <div>
-                                <div className="text-3xl font-black text-green-600">50+</div>
-                                <div className="text-sm text-gray-500 font-medium">Pengajar Dedikatif</div>
-                            </div>
+                        <div className="text-gray-600 text-lg leading-relaxed space-y-4 text-justify">
+                            <p>
+                                Bermula dari pengajian Al-Qur'an di Kauman Semarang yang diasuh oleh <strong>Almaghfurlah KH. M Turmudzi Taslim, AH.</strong>, Pondok Pesantren Raudhatul Qur’an tumbuh menjawab kebutuhan umat.
+                            </p>
+                            <p>
+                                Melanjutkan cita-cita beliau, <strong>KH. Hanief Ismail, Lc.</strong> mendirikan <strong>PP. Raudhatul Qur’an Annasimiyyah</strong> pada 10 Muharram 1431 H di Puspanjolo. Ikhtiar ini bertujuan memfasilitasi pelajar dan mahasiswa untuk mendalami Al-Qur'an, Kitab Kuning, serta Bahasa Asing di tengah kesibukan akademis mereka.
+                            </p>
                         </div>
                     </div>
                 </div>
