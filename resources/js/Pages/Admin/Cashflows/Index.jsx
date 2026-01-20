@@ -2,7 +2,7 @@ import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Index({ cashflows, balance, filters }) {
+export default function Index({ cashflows, balance, filters, stats }) {
     const { success } = usePage().props;
     const [showModal, setShowModal] = useState(false);
     const [proofUrl, setProofUrl] = useState(null);
@@ -62,11 +62,38 @@ export default function Index({ cashflows, balance, filters }) {
                 </button>
             </div>
 
-            {/* BALANCE CARD */}
-            <div className="mb-8">
-                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 inline-block min-w-[250px]">
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Current Balance (Saldo)</p>
-                    <p className="text-3xl font-black text-gray-900 mt-2">Rp {balance ? balance.current_balance.toLocaleString('id-ID') : 0}</p>
+            {/* BALANCE & STATS CARDS */}
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-3 mb-2">
+                        <div className="bg-gray-100 p-2 rounded-lg">
+                            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        </div>
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Current Balance (Saldo)</p>
+                    </div>
+                    <p className="text-2xl font-black text-gray-900">Rp {balance ? balance.current_balance.toLocaleString('id-ID') : 0}</p>
+                </div>
+
+                <div className="bg-emerald-50 p-6 rounded-2xl shadow-sm border border-emerald-100">
+                     <div className="flex items-center space-x-3 mb-2">
+                        <div className="bg-emerald-200 p-2 rounded-lg">
+                            <svg className="w-6 h-6 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                         <p className="text-emerald-700 text-xs font-bold uppercase tracking-wider">Total Money In</p>
+                    </div>
+                    <p className="text-2xl font-black text-emerald-700">+ Rp {stats?.total_in?.toLocaleString('id-ID') || 0}</p>
+                    <p className="text-xs text-emerald-600 mt-1">Based on current filter</p>
+                </div>
+
+                <div className="bg-red-50 p-6 rounded-2xl shadow-sm border border-red-100">
+                     <div className="flex items-center space-x-3 mb-2">
+                        <div className="bg-red-200 p-2 rounded-lg">
+                            <svg className="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                        </div>
+                        <p className="text-red-700 text-xs font-bold uppercase tracking-wider">Total Expenses</p>
+                    </div>
+                    <p className="text-2xl font-black text-red-700">- Rp {stats?.total_out?.toLocaleString('id-ID') || 0}</p>
+                    <p className="text-xs text-red-600 mt-1">Based on current filter</p>
                 </div>
             </div>
 

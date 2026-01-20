@@ -35,12 +35,21 @@ class CashflowController extends Controller
              $query->where('category', $request->category);
         }
 
+        // Clone query for stats
+        $statsQuery = clone $query;
+        $totalIn = $statsQuery->clone()->where('direction', 'IN')->sum('amount');
+        $totalOut = $statsQuery->clone()->where('direction', 'OUT')->sum('amount');
+
         $cashflows = $query->paginate(20)->appends($request->only(['month', 'year', 'direction', 'category']));
         $balance = Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
 
         return Inertia::render('Admin/Cashflows/Index', [
             'cashflows' => $cashflows,
             'balance' => $balance,
+            'stats' => [
+                'total_in' => $totalIn,
+                'total_out' => $totalOut,
+            ],
             'success' => session('success'),
             'filters' => $request->only(['month', 'year', 'direction', 'category']),
         ]);

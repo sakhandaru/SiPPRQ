@@ -6,51 +6,96 @@ export default function Dashboard({ auth, data, latestResidents, latestPayments,
         <AdminLayout title="Overview">
             <Head title="Admin Dashboard" />
 
-            {/* SUMMARY CARDS */}
+            {/* 1. ACTION CENTER */}
+            <h2 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-3">Action Center</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Pending Verification */}
+                <a href={route('admin.payments.index', { status: 'PENDING' })} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-32 relative overflow-hidden group hover:shadow-md transition cursor-pointer">
+                    <div className="z-10 flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Pending Verification</p>
+                            <h3 className={`text-4xl font-black ${data.pending_payments_count > 0 ? 'text-orange-500' : 'text-gray-900'}`}>
+                                {data.pending_payments_count}
+                            </h3>
+                        </div>
+                        <div className="bg-orange-50 p-2 rounded-lg text-orange-600">
+                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                    </div>
+                    <div className="z-10 text-xs font-bold text-gray-400 group-hover:text-orange-600 transition">View Payments →</div>
+                </a>
+
+                {/* Unpaid Bills */}
+                <a href={route('admin.tracker.index', { status: 'UNPAID', month: new Date().getMonth() + 1, year: new Date().getFullYear() })} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-32 relative overflow-hidden group hover:shadow-md transition cursor-pointer">
+                    <div className="z-10 flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Unpaid Bills (This Month)</p>
+                            <h3 className="text-4xl font-black text-gray-900">
+                                {data.unpaid_bills_count}
+                            </h3>
+                        </div>
+                        <div className="bg-red-50 p-2 rounded-lg text-red-600">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        </div>
+                    </div>
+                    <div className="z-10 text-xs font-bold text-gray-400 group-hover:text-red-600 transition">Check Tracker →</div>
+                </a>
+
+                {/* Active Residents */}
+                <a href={route('admin.users.index')} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-32 relative overflow-hidden group hover:shadow-md transition cursor-pointer">
+                    <div className="z-10 flex justify-between items-start">
+                        <div>
+                            <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Active Residents</p>
+                            <h3 className="text-4xl font-black text-gray-900">
+                                {data.active_residents_count}
+                            </h3>
+                        </div>
+                        <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600">
+                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                    </div>
+                    <div className="z-10 text-xs font-bold text-gray-400 group-hover:text-indigo-600 transition">Manage Residents →</div>
+                </a>
+            </div>
+
+            {/* 2. FINANCIAL HEALTH */}
+            <h2 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-3">Financial Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {/* Balance Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-40 relative overflow-hidden group hover:shadow-md transition">
-                    <div className="z-10">
-                        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Total Balance</p>
-                        <h3 className="text-3xl font-extrabold text-gray-900">
+                <div className="bg-gray-900 text-white rounded-2xl p-6 shadow-md border border-gray-800 flex flex-col justify-between h-32 relative overflow-hidden">
+                    <div className="z-10 relative">
+                        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Current Balance</p>
+                        <h3 className="text-3xl font-black tracking-tight">
                             Rp {data.balance.current_balance_fmt}
                         </h3>
                     </div>
-                    <div className="z-10 mt-4 flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        <span>Active</span>
-                    </div>
-                     <div className="absolute right-[-20px] top-[-20px] w-32 h-32 bg-gray-50 rounded-full opacity-50 group-hover:scale-110 transition-transform duration-500"></div>
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-gray-800 rounded-full mix-blend-overlay filter blur-3xl opacity-50 -mr-16 -mt-16"></div>
                 </div>
 
-                {/* Total In Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-40 relative overflow-hidden group hover:shadow-md transition">
-                     <div className="z-10">
-                        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Total Money In</p>
-                        <h3 className="text-3xl font-extrabold text-gray-900">
-                            Rp {data.total_in_fmt}
+                {/* Monthly Income */}
+                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-32 relative overflow-hidden group">
+                     <div>
+                        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Money In (This Month)</p>
+                        <h3 className="text-2xl font-black text-emerald-600">
+                             + Rp {data.total_in_fmt}
                         </h3>
                     </div>
-                     <div className="z-10 mt-4 flex items-center text-sm font-medium text-blue-600 bg-blue-50 w-fit px-2 py-1 rounded-lg">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
-                        <span>Income</span>
+                     <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                        <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '100%' }}></div>
                     </div>
-                    <div className="absolute right-[-20px] top-[-20px] w-32 h-32 bg-blue-50 rounded-full opacity-30 group-hover:scale-110 transition-transform duration-500"></div>
                 </div>
 
-                {/* Total Out Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-40 relative overflow-hidden group hover:shadow-md transition">
-                     <div className="z-10">
-                        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Total Expenses</p>
-                        <h3 className="text-3xl font-extrabold text-gray-900">
-                            Rp {data.total_out_fmt}
+                {/* Monthly Expenses */}
+                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between h-32 relative overflow-hidden group">
+                     <div>
+                        <p className="text-gray-400 text-xs font-bold tracking-wider uppercase mb-1">Expires (This Month)</p>
+                        <h3 className="text-2xl font-black text-red-600">
+                             - Rp {data.total_out_fmt}
                         </h3>
                     </div>
-                     <div className="z-10 mt-4 flex items-center text-sm font-medium text-orange-600 bg-orange-50 w-fit px-2 py-1 rounded-lg">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
-                        <span>Expenses</span>
+                     <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                        <div className="bg-red-500 h-1.5 rounded-full" style={{ width: '100%' }}></div>
                     </div>
-                    <div className="absolute right-[-20px] top-[-20px] w-32 h-32 bg-orange-50 rounded-full opacity-30 group-hover:scale-110 transition-transform duration-500"></div>
                 </div>
             </div>
 
