@@ -56,9 +56,11 @@ class ReportController extends Controller
     {
         $query = \App\Models\KasPayment::with('user');
 
-        if ($request->month && $request->year) {
-            $query->whereMonth('payment_date', $request->month)
-                ->whereYear('payment_date', $request->year);
+        if ($request->filled('month')) {
+            $query->whereMonth('payment_date', $request->month);
+        }
+        if ($request->filled('year')) {
+            $query->whereYear('payment_date', $request->year);
         }
 
         if ($request->status) {

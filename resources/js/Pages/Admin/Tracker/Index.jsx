@@ -1,11 +1,12 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, router, useForm, Link } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 
-export default function Index({ auth, users, stats, filters }) {
-    const [year, setYear] = useState(filters.year);
-    const [month, setMonth] = useState(filters.month);
+export default function Index({ bills, stats, filters, users }) {
+    const [year, setYear] = useState(filters.year || '');
+    const [month, setMonth] = useState(filters.month || '');
     const [status, setStatus] = useState(filters.status || 'ALL');
+    const [type, setType] = useState(filters.type || 'ALL');
 
     // Generate Bill Form
     const [showGenerateModal, setShowGenerateModal] = useState(false);
@@ -41,8 +42,9 @@ export default function Index({ auth, users, stats, filters }) {
         }
     }
 
+    // Trigger filter when any state changes
     const handleFilter = () => {
-        router.get(route('admin.tracker.index'), { year, month, status }, { preserveState: true });
+        router.get(route('admin.tracker.index'), { year, month, status, type }, { preserveState: true, preserveScroll: true });
     };
 
     const handleGenerate = (e) => {
@@ -52,6 +54,7 @@ export default function Index({ auth, users, stats, filters }) {
                 onSuccess: () => {
                     setShowGenerateModal(false);
                     resetGen();
+                    handleFilter(); // Reload
                 }
             });
         } else {
@@ -65,6 +68,7 @@ export default function Index({ auth, users, stats, filters }) {
                 onSuccess: () => {
                     setShowGenerateModal(false);
                     resetManual();
+                    handleFilter(); // Reload
                 },
                 preserveScroll: true
              });
@@ -79,8 +83,8 @@ export default function Index({ auth, users, stats, filters }) {
     ];
 
     return (
-        <AdminLayout title="Payment Tracker">
-            <Head title="Payment Tracker" />
+        <AdminLayout title="Bill Tracker">
+            <Head title="Bill Tracker" />
 
             {/* GENERATE MODAL */}
             {showGenerateModal && (
@@ -113,7 +117,7 @@ export default function Index({ auth, users, stats, filters }) {
                             {billType === 'MONTHLY' ? (
                                 <>
                                     <div className="bg-blue-50 p-4 rounded-xl text-blue-700 text-sm mb-4">
-                                        Generates standard monthly bills for all active residents. 
+                                        Generates standard monthly bills (KAS, etc) for all active residents. 
                                         Checks logic for existing bills to avoid duplicates.
                                     </div>
                                     <div>
@@ -222,8 +226,8 @@ export default function Index({ auth, users, stats, filters }) {
 
             <div className="flex justify-between items-center mb-6">
                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">Payment Tracker</h2>
-                    <p className="text-gray-500 text-sm">Monitor and verify payments</p>
+                    <h2 className="text-xl font-bold text-gray-900">Bill Tracker</h2>
+                    <p className="text-gray-500 text-sm">Monitor all bills (Kas, Wifi, Incidental).</p>
                 </div>
                  <button 
                     onClick={() => setShowGenerateModal(true)}
@@ -234,50 +238,53 @@ export default function Index({ auth, users, stats, filters }) {
                 </button>
             </div>
 
-            {/* SUMMARY STATS */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider">Total Residents</p>
-                    <p className="text-3xl font-black text-gray-900 mt-2">{stats.total_users}</p>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p className="text-emerald-600 text-xs font-bold uppercase tracking-wider">Paid</p>
-                    <p className="text-3xl font-black text-emerald-600 mt-2">{stats.paid}</p>
-                </div>
+            {/* SUMMARY STATS (Global) */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <p className="text-yellow-600 text-xs font-bold uppercase tracking-wider">Waiting Verification</p>
-                    <p className="text-3xl font-black text-yellow-600 mt-2">{stats.waiting}</p>
+                    <p className="text-3xl font-black text-yellow-600 mt-2">{stats.total_waiting}</p>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <p className="text-red-500 text-xs font-bold uppercase tracking-wider">Unpaid</p>
-                    <p className="text-3xl font-black text-red-500 mt-2">{stats.unpaid}</p>
+                    <p className="text-red-500 text-xs font-bold uppercase tracking-wider">Total Unpaid Bills</p>
+                    <p className="text-3xl font-black text-red-500 mt-2">{stats.total_unpaid}</p>
                 </div>
             </div>
 
             {/* HEADER & FILTERS */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Payment Tracker</h1>
-                    <p className="text-gray-500 text-sm mt-1">Monitor monthly payments for all residents.</p>
+                    <h1 className="text-2xl font-bold text-gray-900">All Bills</h1>
+                    <p className="text-gray-500 text-sm mt-1">Showing {bills.total} bills.</p>
                 </div>
                 <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
                     <select 
+                        value={type} 
+                        onChange={(e) => setType(e.target.value)}
+                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
+                    >
+                        <option value="ALL">All Types</option>
+                        <option value="KAS">KAS</option>
+                        <option value="WIFI">WIFI</option>
+                        <option value="INCIDENTAL">INCIDENTAL</option>
+                    </select>
+
+                    <select 
                         value={status} 
                         onChange={(e) => setStatus(e.target.value)}
-                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black"
+                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
                     >
                         <option value="ALL">All Status</option>
                         <option value="PAID">Paid</option>
                         <option value="WAITING">Waiting Verification</option>
                         <option value="UNPAID">Unpaid</option>
-                        <option value="NO_BILL">No Bill</option>
                     </select>
 
                     <select 
                         value={month} 
                         onChange={(e) => setMonth(e.target.value)}
-                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black"
+                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
                     >
+                        <option value="">All Months</option>
                         {months.map(m => (
                             <option key={m.id} value={m.id}>{m.name}</option>
                         ))}
@@ -285,9 +292,10 @@ export default function Index({ auth, users, stats, filters }) {
                     <select 
                         value={year} 
                         onChange={(e) => setYear(e.target.value)}
-                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black"
+                        className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
                     >
-                        {[2024, 2025, 2026].map(y => (
+                        <option value="">All Years</option>
+                        {[2024, 2025, 2026, 2027].map(y => (
                             <option key={y} value={y}>{y}</option>
                         ))}
                     </select>
@@ -300,54 +308,67 @@ export default function Index({ auth, users, stats, filters }) {
                 </div>
             </div>
 
-            {/* TRACKER TABLE */}
+            {/* TRACKER TABLE - BILL BASED */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase text-xs font-bold tracking-wider">
                         <tr>
-                            <th className="p-6">Resident Name</th>
+                            <th className="p-6">Resident</th>
+                            <th className="p-6">Bill Details</th>
+                            <th className="p-6">Amount</th>
                             <th className="p-6 text-center">Status</th>
                             <th className="p-6 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {users.length > 0 ? users.map((user) => (
-                            <tr key={user.id} className="hover:bg-gray-50 transition">
+                        {bills.data.length > 0 ? bills.data.map((bill) => (
+                            <tr key={bill.id} className="hover:bg-gray-50 transition">
                                 <td className="p-6">
-                                    <p className="font-bold text-gray-900">{user.name}</p>
-                                    <p className="text-xs text-gray-400">{user.email}</p>
+                                    <p className="font-bold text-gray-900">{bill.resident_name}</p>
+                                    <p className="text-xs text-gray-400">{bill.resident_phone || '-'}</p>
+                                </td>
+                                <td className="p-6">
+                                    <div className="flex items-center">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded mr-2 uppercase tracking-wide border ${
+                                            bill.type === 'KAS' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                            bill.type === 'WIFI' ? 'bg-purple-50 text-purple-600 border-purple-200' :
+                                            'bg-orange-50 text-orange-600 border-orange-200'
+                                        }`}>
+                                            {bill.type}
+                                        </span>
+                                        <p className="font-bold text-gray-800">{bill.title}</p>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">{bill.month_name}</p>
+                                </td>
+                                <td className="p-6">
+                                    <p className="font-mono font-medium">Rp {bill.amount.toLocaleString()}</p>
                                 </td>
                                 <td className="p-6 text-center">
-                                    {user.status === 'PAID' && (
+                                    {bill.status === 'PAID' && (
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
                                             PAID
                                         </span>
                                     )}
-                                    {user.status === 'WAITING' && (
+                                    {bill.status === 'WAITING' && (
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
                                             WAITING VERIFICATION
                                         </span>
                                     )}
-                                    {user.status === 'UNPAID' && (
+                                    {bill.status === 'UNPAID' && (
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
                                             UNPAID
                                         </span>
                                     )}
-                                    {user.status === 'NO_BILL' && (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-400">
-                                            NO BILL
-                                        </span>
-                                    )}
                                 </td>
                                 <td className="p-6 text-right">
-                                    {user.status === 'WAITING' ? (
+                                    {bill.status === 'WAITING' ? (
                                         // Direct link to verify payment
                                         <a href={route('admin.payments.index')} className="text-indigo-600 font-bold text-sm hover:underline">
-                                            Verify Now
+                                            Verify Payment
                                         </a>
-                                    ) : user.status === 'UNPAID' ? (
+                                    ) : bill.status === 'UNPAID' ? (
                                         <a 
-                                            href={`https://wa.me/${user.phone ? user.phone.replace(/^0/, '62') : ''}?text=${encodeURIComponent(`Assalamualaikum ${user.name}, mohon melunasi tagihan KAS untuk bulan ${user.bill_month_name} sebesar Rp ${user.bill_amount.toLocaleString('id-ID')}. Terima kasih - Admin SiPPRQ.`)}`}
+                                            href={`https://wa.me/${bill.resident_phone ? bill.resident_phone.replace(/^0/, '62') : ''}?text=${encodeURIComponent(`Assalamualaikum ${bill.resident_name}, mohon melunasi tagihan *${bill.title} (${bill.month_name})* sebesar Rp ${bill.amount.toLocaleString('id-ID')}. Terima kasih - Admin SiPPRQ.`)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center text-green-600 font-bold text-sm hover:text-green-800 transition"
@@ -363,13 +384,26 @@ export default function Index({ auth, users, stats, filters }) {
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan="3" className="p-8 text-center text-gray-400">
-                                    No residents found active in this period.
+                                <td colSpan="5" className="p-12 text-center text-gray-400">
+                                    No bills found matching your filter.
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
+                 {/* PAGINATION */}
+                 {bills.links && bills.links.length > 3 && (
+                     <div className="p-4 border-t border-gray-100 flex justify-center">
+                        {bills.links.map((link, i) => (
+                            <Link
+                                key={i}
+                                href={link.url || '#'}
+                                className={`px-3 py-1 mx-1 rounded text-sm ${link.active ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100'} ${!link.url && 'opacity-50 cursor-not-allowed'}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </AdminLayout>
     );

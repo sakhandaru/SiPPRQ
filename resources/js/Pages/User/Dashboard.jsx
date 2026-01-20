@@ -71,7 +71,9 @@ export default function UserDashboard({ user, bills, paymentHistory }) {
             >
                 <div className="flex justify-between items-start mb-4">
                     <div>
-                        <p className={`text-sm font-bold uppercase tracking-wider ${isSelected ? 'text-gray-400' : 'text-gray-400'}`}>{bill.type}</p>
+                        <p className={`text-sm font-bold uppercase tracking-wider ${isSelected ? 'text-gray-400' : 'text-gray-400'}`}>
+                            {bill.type === 'INCIDENTAL' && bill.title ? bill.title : bill.type}
+                        </p>
                         <p className={`text-xs ${isSelected ? 'text-gray-400' : 'text-gray-400'}`}>{bill.month}</p>
                     </div>
                     

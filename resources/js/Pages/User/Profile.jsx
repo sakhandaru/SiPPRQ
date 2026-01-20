@@ -12,7 +12,7 @@ export default function Profile({ user, profile, status }) {
         // Resident Profile
         wali_nama: userProfile.wali_nama || '',
         wali_kontak: userProfile.wali_kontak || '',
-        alamat_asal: userProfile.alamat_asal || '',
+        address_detail: userProfile.address_detail || '',
         pendidikan: userProfile.pendidikan || 'KULIAH',
         institusi: userProfile.institusi || '',
         tahun_masuk: userProfile.tahun_masuk || '',
@@ -92,11 +92,11 @@ export default function Profile({ user, profile, status }) {
                         <h3 className="text-lg font-bold text-gray-900 mb-6 border-b border-gray-100 pb-2">Personal Data</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Origin Address (Alamat Asal)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Address Detail</label>
                                 <textarea 
                                     className="w-full rounded-xl border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
                                     rows="3"
-                                    value={data.alamat_asal}
+                                    value={data.address_detail}
                                     disabled
                                 ></textarea>
                             </div>

@@ -11,15 +11,38 @@ use Inertia\Inertia;
 
 class CashflowController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $cashflows = Cashflow::with('creator')->latest()->paginate(20);
+        $query = Cashflow::with('creator')->latest();
+
+        // Filter by Month
+        if ($request->filled('month')) {
+            $query->whereMonth('created_at', $request->month);
+        }
+
+        // Filter by Year
+        if ($request->filled('year')) {
+            $query->whereYear('created_at', $request->year);
+        }
+
+        // Filter by Direction
+        if ($request->filled('direction') && $request->direction !== 'ALL') {
+            $query->where('direction', $request->direction);
+        }
+        
+        // Filter by Category
+        if ($request->filled('category') && $request->category !== 'ALL') {
+             $query->where('category', $request->category);
+        }
+
+        $cashflows = $query->paginate(20)->appends($request->only(['month', 'year', 'direction', 'category']));
         $balance = Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
 
         return Inertia::render('Admin/Cashflows/Index', [
             'cashflows' => $cashflows,
             'balance' => $balance,
             'success' => session('success'),
+            'filters' => $request->only(['month', 'year', 'direction', 'category']),
         ]);
     }
 

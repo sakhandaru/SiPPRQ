@@ -1,11 +1,15 @@
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Index({ cashflows, balance }) {
+export default function Index({ cashflows, balance, filters }) {
     const { success } = usePage().props;
     const [showModal, setShowModal] = useState(false);
     const [proofUrl, setProofUrl] = useState(null);
+
+    const [month, setMonth] = useState(filters.month || '');
+    const [year, setYear] = useState(filters.year || '');
+    const [direction, setDirection] = useState(filters.direction || 'ALL');
 
     const { data, setData, post, processing, errors, reset, transform } = useForm({
         direction: 'OUT',
@@ -15,6 +19,10 @@ export default function Index({ cashflows, balance }) {
         proof_file: null,
     });
     
+    const handleFilter = () => {
+        router.get(route('admin.cashflows.index'), { month, year, direction }, { preserveState: true });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         
@@ -30,6 +38,13 @@ export default function Index({ cashflows, balance }) {
             },
         });
     };
+
+    const months = [
+        { id: 1, name: 'January' }, { id: 2, name: 'February' }, { id: 3, name: 'March' },
+        { id: 4, name: 'April' }, { id: 5, name: 'May' }, { id: 6, name: 'June' },
+        { id: 7, name: 'July' }, { id: 8, name: 'August' }, { id: 9, name: 'September' },
+        { id: 10, name: 'October' }, { id: 11, name: 'November' }, { id: 12, name: 'December' }
+    ];
 
     return (
         <AdminLayout title="Cashflow Management">
@@ -54,6 +69,47 @@ export default function Index({ cashflows, balance }) {
                     <p className="text-3xl font-black text-gray-900 mt-2">Rp {balance ? balance.current_balance.toLocaleString('id-ID') : 0}</p>
                 </div>
             </div>
+
+            {/* FILTERS */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-wrap gap-4">
+                <select 
+                    value={direction} 
+                    onChange={(e) => setDirection(e.target.value)}
+                    className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
+                >
+                    <option value="ALL">All Directions</option>
+                    <option value="IN">Income (IN)</option>
+                    <option value="OUT">Expense (OUT)</option>
+                </select>
+
+                <select 
+                    value={month} 
+                    onChange={(e) => setMonth(e.target.value)}
+                    className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
+                >
+                    <option value="">All Months</option>
+                    {months.map(m => (
+                        <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                </select>
+                <select 
+                    value={year} 
+                    onChange={(e) => setYear(e.target.value)}
+                    className="rounded-xl border-gray-200 focus:border-black focus:ring-black py-2"
+                >
+                    <option value="">All Years</option>
+                    {[2024, 2025, 2026, 2027].map(y => (
+                        <option key={y} value={y}>{y}</option>
+                    ))}
+                </select>
+                <button 
+                    onClick={handleFilter}
+                    className="bg-black text-white px-6 py-2 rounded-xl font-bold hover:bg-gray-800 transition"
+                >
+                    Filter
+                </button>
+            </div>
+
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-left text-sm text-gray-500">
                     <thead className="bg-gray-50 text-xs uppercase text-gray-400 font-bold tracking-wider">
@@ -68,7 +124,7 @@ export default function Index({ cashflows, balance }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {cashflows.data.map((flow) => (
+                        {cashflows.data.length > 0 ? cashflows.data.map((flow) => (
                             <tr key={flow.id} className="hover:bg-gray-50 transition">
                                 <td className="px-6 py-4">
                                     {new Date(flow.created_at).toLocaleDateString()}
@@ -106,20 +162,26 @@ export default function Index({ cashflows, balance }) {
                                     {flow.creator ? flow.creator.name : 'System'}
                                 </td>
                             </tr>
-                        ))}
+                        )) : (
+                            <tr>
+                                <td colSpan="7" className="p-8 text-center text-gray-400">No transactions found.</td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
                  {/* PAGINATION */}
-                 <div className="p-4 border-t border-gray-100 flex justify-center">
-                    {cashflows.links.map((link, i) => (
-                         <Link
-                            key={i}
-                            href={link.url || '#'}
-                            className={`px-3 py-1 mx-1 rounded text-sm ${link.active ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100'} ${!link.url && 'opacity-50 cursor-not-allowed'}`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
-                    ))}
-                </div>
+                 {cashflows.links && cashflows.links.length > 3 && (
+                     <div className="p-4 border-t border-gray-100 flex justify-center">
+                        {cashflows.links.map((link, i) => (
+                            <Link
+                                key={i}
+                                href={link.url || '#'}
+                                className={`px-3 py-1 mx-1 rounded text-sm ${link.active ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100'} ${!link.url && 'opacity-50 cursor-not-allowed'}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* PROOF MODAL */}

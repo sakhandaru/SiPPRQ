@@ -12,14 +12,38 @@ use Inertia\Inertia;
 
 class PaymentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $payments = KasPayment::with('user')->latest()->paginate(15);
+        $query = KasPayment::with(['user', 'bill'])
+            ->latest('payment_date');
+
+        // Filter by Month
+        if ($request->filled('month')) {
+            $query->whereMonth('payment_date', $request->month);
+        }
+
+        // Filter by Year
+        if ($request->filled('year')) {
+            $query->whereYear('payment_date', $request->year);
+        }
+
+        // Filter by Status
+        if ($request->filled('status') && $request->status !== 'ALL') {
+             $query->where('status', $request->status);
+        }
+
+        // Filter by Type
+        if ($request->filled('type') && $request->type !== 'ALL') {
+            $query->where('type', $request->type);
+        }
+        
+        $payments = $query->paginate(15)->appends($request->only(['month', 'year', 'status', 'type']));
 
         return Inertia::render('Admin/Payments/Index', [
             'payments' => $payments,
             'success' => session('success'),
             'error' => session('error'),
+            'filters' => $request->only(['month', 'year', 'status', 'type']),
         ]);
     }
 
