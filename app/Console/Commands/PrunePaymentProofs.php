@@ -18,7 +18,7 @@ class PrunePaymentProofs extends Command
     public function handle()
     {
         $cutoffDate = now()->subMonths(3);
-        $this->info("Scanning for verified payments older than: " . $cutoffDate->toDateString());
+        $this->info('Scanning for verified payments older than: '.$cutoffDate->toDateString());
 
         $payments = \App\Models\KasPayment::where('status', 'VERIFIED')
             ->where('created_at', '<', $cutoffDate)
@@ -26,7 +26,8 @@ class PrunePaymentProofs extends Command
             ->get();
 
         if ($payments->isEmpty()) {
-            $this->info("No payments found eligible for pruning.");
+            $this->info('No payments found eligible for pruning.');
+
             return;
         }
 

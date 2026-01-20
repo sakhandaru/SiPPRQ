@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\ResidentProfile;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -38,14 +38,14 @@ class Phase1Test extends TestCase
             'wali_kontak' => '08123',
             'alamat_asal' => 'Test Address',
             'pendidikan' => 'KULIAH',
-            'tahun_masuk' => 2024
+            'tahun_masuk' => 2024,
         ]);
 
         $response = $this->actingAs($user)->getJson('/my-profile');
 
         $response->assertStatus(200)
-                 ->assertJsonPath('id', $user->id)
-                 ->assertJsonPath('resident_profile.wali_nama', 'Test Parent');
+            ->assertJsonPath('id', $user->id)
+            ->assertJsonPath('resident_profile.wali_nama', 'Test Parent');
     }
 
     public function test_admin_can_create_user_with_profile()

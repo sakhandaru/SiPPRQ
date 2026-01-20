@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\BillService;
+use Illuminate\Console\Command;
 
 class MakeMonthlyBills extends Command
 {

@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class PaymentsExport implements FromView, ShouldAutoSize
 {
     protected $data;
+
     protected $request;
 
     public function __construct($data, $request)
@@ -21,7 +22,7 @@ class PaymentsExport implements FromView, ShouldAutoSize
     {
         return view('admin.reports.payments_pdf', [
             'data' => $this->data,
-            'request' => $this->request
+            'request' => $this->request,
         ]);
     }
 }

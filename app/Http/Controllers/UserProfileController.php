@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Inertia\Inertia;
-use Illuminate\Validation\Rule;
 
 class UserProfileController extends Controller
 {
     public function show(Request $request)
     {
         $user = $request->user()->load('residentProfile');
+
         return Inertia::render('User/Profile', [
             'user' => $user,
             'profile' => $user->residentProfile,
@@ -22,7 +21,7 @@ class UserProfileController extends Controller
     public function update(Request $request)
     {
         $user = $request->user();
-        
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],

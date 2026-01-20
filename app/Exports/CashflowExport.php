@@ -9,8 +9,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class CashflowExport implements FromView, ShouldAutoSize
 {
     protected $data;
+
     protected $totalIn;
+
     protected $totalOut;
+
     protected $request;
 
     public function __construct($data, $totalIn, $totalOut, $request)
@@ -27,7 +30,7 @@ class CashflowExport implements FromView, ShouldAutoSize
             'data' => $this->data,
             'totalIn' => $this->totalIn,
             'totalOut' => $this->totalOut,
-            'request' => $this->request
+            'request' => $this->request,
         ]);
     }
 }

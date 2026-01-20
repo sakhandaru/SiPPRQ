@@ -23,12 +23,12 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::resource('admin/users', \App\Http\Controllers\AdminUserController::class)->names('admin.users');
-    
+
     // Admin Payments
     Route::get('admin/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('admin.payments.index');
     Route::post('admin/payments/{payment}/verify', [\App\Http\Controllers\Admin\PaymentController::class, 'verify'])->name('admin.payments.verify');
     Route::post('admin/payments/{payment}/reject', [\App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('admin.payments.reject');
-    
+
     // Admin Cashflows
     Route::get('admin/cashflows', [\App\Http\Controllers\Admin\CashflowController::class, 'index'])->name('admin.cashflows.index');
     Route::post('admin/cashflows', [\App\Http\Controllers\Admin\CashflowController::class, 'store'])->name('admin.cashflows.store');
@@ -43,7 +43,7 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('admin/tracker', [\App\Http\Controllers\Admin\TrackerController::class, 'index'])->name('admin.tracker.index');
     Route::post('admin/bills/generate', [\App\Http\Controllers\Admin\BillController::class, 'generate'])->name('admin.bills.generate');
     Route::post('admin/bills/store', [\App\Http\Controllers\Admin\BillController::class, 'store'])->name('admin.bills.store');
-    
+
     // API Regions (Session Authenticated)
     Route::get('api/provinces', [\App\Http\Controllers\Api\RegionController::class, 'provinces'])->name('api.regions.provinces');
     Route::get('api/provinces/{province}/cities', [\App\Http\Controllers\Api\RegionController::class, 'cities'])->name('api.regions.cities');
@@ -53,11 +53,11 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
 Route::middleware(['auth', 'role:USER'])->group(function () {
     Route::get('my-profile', [\App\Http\Controllers\UserProfileController::class, 'show'])->name('my-profile.show');
     Route::put('my-profile', [\App\Http\Controllers\UserProfileController::class, 'update'])->name('my-profile.update');
-    
+
     // User Payments
     Route::get('payments', [\App\Http\Controllers\User\PaymentController::class, 'index'])->name('user.payments.index');
     Route::post('payments', [\App\Http\Controllers\User\PaymentController::class, 'store'])->name('user.payments.store');
-    
+
     // User Self-Service Bill
     Route::post('bills', [\App\Http\Controllers\User\BillController::class, 'store'])->name('user.bills.store');
 });

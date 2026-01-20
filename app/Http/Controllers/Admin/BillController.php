@@ -23,7 +23,7 @@ class BillController extends Controller
         ]);
 
         $result = $this->billService->generateForMonth($request->year, $request->month);
-        
+
         $monthName = \Carbon\Carbon::createFromDate($request->year, $request->month, 1)->translatedFormat('F Y');
 
         return back()->with('success', "Generate Bill for {$monthName} success! ({$result['users_count']} users processed)");

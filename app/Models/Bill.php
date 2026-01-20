@@ -9,6 +9,7 @@ class Bill extends Model
     use \Illuminate\Database\Eloquent\Factories\HasFactory;
 
     protected $table = 'bills';
+
     protected $fillable = [
         'user_id',
         'type',

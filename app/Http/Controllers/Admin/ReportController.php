@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use Inertia\Inertia;
 
 class ReportController extends Controller
@@ -31,35 +30,41 @@ class ReportController extends Controller
 
         if ($request->export === 'pdf') {
             try {
-                if (ob_get_length()) ob_end_clean();
+                if (ob_get_length()) {
+                    ob_end_clean();
+                }
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.cashflow_pdf', compact('data', 'totalIn', 'totalOut', 'request'));
+
                 return $pdf->download('cashflow_report.pdf');
             } catch (\Exception $e) {
-                return response()->json(['error' => 'PDF Generation Failed: ' . $e->getMessage()], 500);
+                return response()->json(['error' => 'PDF Generation Failed: '.$e->getMessage()], 500);
             }
         }
-        
+
         if ($request->export === 'excel') {
-            if (ob_get_length()) ob_end_clean();
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+
             return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\CashflowExport($data, $totalIn, $totalOut, $request), 'cashflow_report.xlsx');
         }
 
         return view('admin.reports.cashflow_pdf', compact('data', 'totalIn', 'totalOut', 'request')); // Preview
     }
 
-    public function payments(Request $request) 
+    public function payments(Request $request)
     {
         $query = \App\Models\KasPayment::with('user');
 
         if ($request->month && $request->year) {
             $query->whereMonth('payment_date', $request->month)
-                  ->whereYear('payment_date', $request->year);
+                ->whereYear('payment_date', $request->year);
         }
 
         if ($request->status) {
             $query->where('status', $request->status);
         }
-        
+
         if ($request->type) {
             $query->where('type', $request->type);
         }
@@ -68,16 +73,22 @@ class ReportController extends Controller
 
         if ($request->export === 'pdf') {
             try {
-                if (ob_get_length()) ob_end_clean();
+                if (ob_get_length()) {
+                    ob_end_clean();
+                }
                 $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.payments_pdf', compact('data', 'request'));
+
                 return $pdf->download('payments_report.pdf');
             } catch (\Exception $e) {
-                return response()->json(['error' => 'PDF Generation Failed: ' . $e->getMessage()], 500);
+                return response()->json(['error' => 'PDF Generation Failed: '.$e->getMessage()], 500);
             }
         }
 
         if ($request->export === 'excel') {
-            if (ob_get_length()) ob_end_clean();
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+
             return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\PaymentsExport($data, $request), 'payments_report.xlsx');
         }
 

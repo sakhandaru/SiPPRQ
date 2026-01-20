@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\KasPayment;
-use App\Models\Cashflow;
 use App\Models\Balance;
+use App\Models\Cashflow;
+use App\Models\KasPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
 use Inertia\Inertia;
 
 class PaymentController extends Controller
@@ -16,6 +15,7 @@ class PaymentController extends Controller
     public function index()
     {
         $payments = KasPayment::with('user')->latest()->paginate(15);
+
         return Inertia::render('Admin/Payments/Index', [
             'payments' => $payments,
             'success' => session('success'),
@@ -35,7 +35,7 @@ class PaymentController extends Controller
             $isLocked = \App\Models\PeriodLock::where('month', $billDate->month)
                 ->where('year', $billDate->year)
                 ->exists();
-            
+
             if ($isLocked) {
                 return back()->with('error', 'Cannot modify payments in a locked period.');
             }
@@ -72,7 +72,7 @@ class PaymentController extends Controller
             // 4. Update Balance (Singleton logic: ID 1)
             $balance = Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
             $balance->increment('current_balance', $payment->amount);
-            
+
             // 5. Audit Log
             \App\Services\AuditService::log('VERIFY_PAYMENT', 'KasPayment', $payment->id, "Verified payment ID {$payment->id} amount {$payment->amount}");
         });
@@ -92,7 +92,7 @@ class PaymentController extends Controller
             $isLocked = \App\Models\PeriodLock::where('month', $billDate->month)
                 ->where('year', $billDate->year)
                 ->exists();
-            
+
             if ($isLocked) {
                 return back()->with('error', 'Cannot modify payments in a locked period.');
             }

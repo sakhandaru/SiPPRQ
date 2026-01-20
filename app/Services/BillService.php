@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\FeeSetting;
 use App\Models\Bill;
+use App\Models\FeeSetting;
+use App\Models\User;
 use Carbon\Carbon;
 
 class BillService
@@ -12,13 +12,13 @@ class BillService
     public function generateForMonth($year, $month)
     {
         $targetDate = Carbon::createFromDate($year, $month, 1)->format('Y-m-d');
-        
+
         $users = User::where('role', 'USER')->where('status', 'AKTIF')->get();
-        // Pre-fetch fees to avoid query in loop? 
+        // Pre-fetch fees to avoid query in loop?
         // Actually generateForUser will fetch fees? Or pass fees?
         // Let's optimize: fetch fees once and pass to generateForUser?
         // For simplicity now, let's keep it simple.
-        
+
         $count = 0;
 
         foreach ($users as $user) {
@@ -29,7 +29,7 @@ class BillService
 
         return [
             'users_count' => $users->count(),
-            'bills_created' => $count
+            'bills_created' => $count,
         ];
     }
 
@@ -52,7 +52,9 @@ class BillService
                     'status' => 'UNPAID',
                 ]
             );
-            if ($bill->wasRecentlyCreated) $created = true;
+            if ($bill->wasRecentlyCreated) {
+                $created = true;
+            }
         }
 
         // 2. WIFI Bill
@@ -68,7 +70,9 @@ class BillService
                     'status' => 'UNPAID',
                 ]
             );
-            if ($bill->wasRecentlyCreated) $created = true;
+            if ($bill->wasRecentlyCreated) {
+                $created = true;
+            }
         }
 
         return $created;

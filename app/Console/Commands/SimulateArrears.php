@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Bill;
+use App\Models\FeeSetting;
 use App\Models\KasPayment;
 use App\Models\User;
-use App\Models\FeeSetting;
+use Illuminate\Console\Command;
 
 class SimulateArrears extends Command
 {
@@ -29,26 +29,26 @@ class SimulateArrears extends Command
      */
     public function handle()
     {
-        if (!$this->confirm('This will DELETE ALL Payment and Bill data. Are you sure?')) {
+        if (! $this->confirm('This will DELETE ALL Payment and Bill data. Are you sure?')) {
             return;
         }
 
         $this->info('Truncating Bills and KasPayments...');
-        
+
         \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-        KasPayment::truncate(); 
+        KasPayment::truncate();
         Bill::truncate();
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
 
         $users = User::where('role', 'USER')->where('status', 'AKTIF')->get();
         $fees = FeeSetting::all()->pluck('amount', 'type');
-        
+
         $months = [
-            '2025-12-01', 
-            '2026-01-01', 
-            '2026-02-01', 
-            '2026-03-01', 
-            '2026-04-01'
+            '2025-12-01',
+            '2026-01-01',
+            '2026-02-01',
+            '2026-03-01',
+            '2026-04-01',
         ];
 
         $count = 0;

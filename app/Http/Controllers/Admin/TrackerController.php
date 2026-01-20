@@ -14,7 +14,7 @@ class TrackerController extends Controller
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
         $filterStatus = $request->input('status', 'ALL');
-        
+
         // Format to YYYY-MM-01 for database comparison
         $targetMonth = \Carbon\Carbon::createFromDate($year, $month, 1)->format('Y-m-d');
 
@@ -22,13 +22,13 @@ class TrackerController extends Controller
             ->where('status', 'AKTIF')
             ->orderBy('name')
             ->with(['bills' => function ($query) use ($targetMonth) {
-                $query->where('month', $targetMonth); 
+                $query->where('month', $targetMonth);
             }, 'bills.latestPayment'])
             ->get()
             ->map(function ($user) use ($targetMonth) {
                 // Determine KAS Bill Status
                 $kasBill = $user->bills->firstWhere('type', 'KAS');
-                
+
                 $status = 'NO_BILL';
                 $paymentId = null;
 
@@ -72,10 +72,10 @@ class TrackerController extends Controller
             'users' => $users,
             'stats' => $stats,
             'filters' => [
-                'year' => (int)$year,
-                'month' => (int)$month,
+                'year' => (int) $year,
+                'month' => (int) $month,
                 'status' => $filterStatus,
-            ]
+            ],
         ]);
     }
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('locked_at');
             $table->foreignId('locked_by')->constrained('users');
             $table->timestamps();
-            
+
             $table->unique(['month', 'year']);
         });
     }

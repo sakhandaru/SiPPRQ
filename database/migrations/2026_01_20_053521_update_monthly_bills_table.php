@@ -21,9 +21,9 @@ return new class extends Migration
             // We'll rely on string-like behavior.
             // If it fails due to enum type, we might need a DB::statement.
         });
-        
-         // Force change type to string
-        DB::statement("ALTER TABLE bills MODIFY COLUMN type VARCHAR(255)");
+
+        // Force change type to string
+        DB::statement('ALTER TABLE bills MODIFY COLUMN type VARCHAR(255)');
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\ResidentProfile;
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RegionSeeder::class,
-             DefaultFeeSeeder::class, // Added for completeness if it exists
+            DefaultFeeSeeder::class, // Added for completeness if it exists
         ]);
         // Admin
         User::create([
@@ -28,6 +28,13 @@ class DatabaseSeeder extends Seeder
             'status' => 'AKTIF',
         ]);
 
+        // Fetch valid regions for seeding (assuming RegionSeeder ran first)
+        // Kept here in case we uncomment the users later
+        $province = \App\Models\Province::first();
+        $city = \App\Models\City::where('province_id', $province?->id)->first();
+        $district = \App\Models\District::where('city_id', $city?->id)->first();
+
+        /*
         // User 1
         $user1 = User::create([
             'name' => 'Anak Asrama 1',
@@ -78,5 +85,6 @@ class DatabaseSeeder extends Seeder
             'institusi' => 'SMA Negeri 1 Jakarta',
             'tahun_masuk' => 2024,
         ]);
+        */
     }
 }

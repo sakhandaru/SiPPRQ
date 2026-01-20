@@ -29,12 +29,12 @@ class PaymentController extends Controller
             if ($bill->user_id !== auth()->id()) {
                 continue; // Skip if not owner
             }
-            
+
             if ($bill->status === 'PAID') {
                 continue; // Skip if already paid
             }
 
-            // Check if there is already a PENDING payment? 
+            // Check if there is already a PENDING payment?
             // Optional but good practice. For now, we trust the UI state but backend double-check is good.
             // If already pending, we might duplicate. MVP: Allow duplicate submission just in case they re-submit?
             // Let's just create it. Admin can reject duplicate.
@@ -47,7 +47,7 @@ class PaymentController extends Controller
                 'proof_image' => $path,
                 'status' => 'PENDING',
             ]);
-            
+
             $count++;
         }
 

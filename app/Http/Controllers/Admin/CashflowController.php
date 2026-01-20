@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Cashflow;
 use App\Models\Balance;
+use App\Models\Cashflow;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
 use Inertia\Inertia;
 
 class CashflowController extends Controller
@@ -16,7 +15,7 @@ class CashflowController extends Controller
     {
         $cashflows = Cashflow::with('creator')->latest()->paginate(20);
         $balance = Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
-        
+
         return Inertia::render('Admin/Cashflows/Index', [
             'cashflows' => $cashflows,
             'balance' => $balance,
@@ -54,7 +53,7 @@ class CashflowController extends Controller
 
             // 2. Update Balance
             $balance = Balance::firstOrCreate(['id' => 1], ['current_balance' => 0]);
-            
+
             if ($request->direction === 'IN') {
                 $balance->increment('current_balance', $request->amount);
             } else {

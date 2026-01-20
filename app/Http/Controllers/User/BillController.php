@@ -23,12 +23,12 @@ class BillController extends Controller
         ]);
 
         // Prevent generating bills for past months?
-        // Logic: if requested date < current month, maybe allow for filling gaps? 
-        // But the feature is "Future Bill". Let's leniently allow any date, 
+        // Logic: if requested date < current month, maybe allow for filling gaps?
+        // But the feature is "Future Bill". Let's leniently allow any date,
         // as the service uses firstOrCreate, so it won't duplicate.
-        
+
         $this->billService->generateForUser(auth()->user(), $request->year, $request->month);
-        
+
         return back()->with('success', 'Bill generated successfully. You can now proceed to payment.');
     }
 }

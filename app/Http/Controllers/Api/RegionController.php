@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Province;
 use App\Models\City;
-use App\Models\District;
+use App\Models\Province;
 
 class RegionController extends Controller
 {

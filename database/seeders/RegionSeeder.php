@@ -2,12 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use App\Models\Province;
 use App\Models\City;
 use App\Models\District;
+use App\Models\Province;
+use Illuminate\Database\Seeder;
 
 class RegionSeeder extends Seeder
 {

@@ -1,15 +1,14 @@
 <?php
 
-use App\Models\User;
-use App\Models\KasPayment;
 use App\Models\Bill;
+use App\Models\KasPayment;
 use App\Models\PeriodLock;
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 test('admin cannot verify payment in locked period', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $user = User::factory()->create(['role' => 'USER']);
-    
+
     // Create Bill for Jan 2025
     $date = \Carbon\Carbon::create(2025, 1, 1);
     $bill = Bill::create([
@@ -17,7 +16,7 @@ test('admin cannot verify payment in locked period', function () {
         'type' => 'KAS',
         'month' => $date, // YYYY-MM-DD
         'amount' => 100000,
-        'status' => 'UNPAID'
+        'status' => 'UNPAID',
     ]);
 
     $payment = KasPayment::create([
@@ -51,13 +50,13 @@ test('admin cannot verify payment in locked period', function () {
 test('admin actions create audit logs', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $user = User::factory()->create(['role' => 'USER']);
-    
+
     $bill = Bill::create([
         'user_id' => $user->id,
         'type' => 'KAS',
-        'month' => now(), 
+        'month' => now(),
         'amount' => 100000,
-        'status' => 'UNPAID'
+        'status' => 'UNPAID',
     ]);
 
     $payment = KasPayment::create([

@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -23,7 +21,7 @@ class DashboardController extends Controller
             $data['total_in_fmt'] = number_format($data['total_in'], 0, ',', '.');
             $data['total_out'] = \App\Models\Cashflow::where('direction', 'OUT')->sum('amount');
             $data['total_out_fmt'] = number_format($data['total_out'], 0, ',', '.');
-            
+
             // LATEST DATA PREVIEWS
             $latestResidents = \App\Models\User::where('role', 'USER')->latest()->take(5)->get();
             $latestPayments = \App\Models\KasPayment::with('user')->where('status', 'VERIFIED')->latest('payment_date')->take(5)->get();
@@ -41,20 +39,20 @@ class DashboardController extends Controller
         // USER LOGIC
         // 1. My Bills (Unpaid Past Bills + Current Month)
         $currentMonth = now()->startOfMonth()->format('Y-m-d');
-        
+
         $bills = \App\Models\Bill::where('user_id', $user->id)
-            ->where(function($q) use ($currentMonth) {
+            ->where(function ($q) use ($currentMonth) {
                 $q->where('status', '!=', 'PAID')
-                  ->orWhere('month', $currentMonth);
+                    ->orWhere('month', $currentMonth);
             })
             ->with(['latestPayment'])
             ->orderBy('month', 'desc')
             ->get();
-        
+
         // 2. History (Real Payment Transactions)
-        $paymentHistory = \App\Models\KasPayment::whereHas('bill', function($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
+        $paymentHistory = \App\Models\KasPayment::whereHas('bill', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
             ->with(['bill'])
             ->latest('payment_date')
             ->get();
@@ -62,7 +60,7 @@ class DashboardController extends Controller
         return Inertia::render('User/Dashboard', [
             'user' => $user,
             'bills' => $bills,
-            'paymentHistory' => $paymentHistory
+            'paymentHistory' => $paymentHistory,
         ]);
     }
 }

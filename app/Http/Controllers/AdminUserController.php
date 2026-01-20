@@ -16,6 +16,7 @@ class AdminUserController extends Controller
     public function index()
     {
         $users = User::with('residentProfile')->paginate(10);
+
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
             'success' => session('success'),
@@ -92,8 +93,9 @@ class AdminUserController extends Controller
     public function edit(string $id)
     {
         $user = User::with('residentProfile')->findOrFail($id);
+
         return Inertia::render('Admin/Users/Edit', [
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -110,7 +112,7 @@ class AdminUserController extends Controller
             'role' => 'required|in:ADMIN,USER',
             'status' => 'required|in:AKTIF,NONAKTIF,ALUMNI',
             'phone' => 'nullable|string',
-             // Profile fields
+            // Profile fields
             'wali_nama' => 'nullable|required_if:role,USER|string',
             'wali_kontak' => 'nullable|required_if:role,USER|string',
             'province_id' => 'exists:provinces,id|nullable',
@@ -138,9 +140,9 @@ class AdminUserController extends Controller
                 ['user_id' => $user->id],
                 $request->only([
                     'wali_nama', 'wali_kontak', 'province_id', 'city_id', 'district_id', 'address_detail',
-                     'birth_date', 'study_program', 'student_id_number',
-                     'pendidikan', 'institusi', 'tahun_masuk', 'tahun_keluar', 
-                    'social_instagram', 'social_facebook', 'social_linkedin'
+                    'birth_date', 'study_program', 'student_id_number',
+                    'pendidikan', 'institusi', 'tahun_masuk', 'tahun_keluar',
+                    'social_instagram', 'social_facebook', 'social_linkedin',
                 ])
             );
 
@@ -167,6 +169,7 @@ class AdminUserController extends Controller
             \Illuminate\Support\Facades\Storage::disk('public')->delete($user->residentProfile->foto_profile);
         }
         $user->delete();
+
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
 }

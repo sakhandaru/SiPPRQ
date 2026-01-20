@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('city_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('district_id')->nullable()->constrained()->nullOnDelete();
             $table->text('address_detail')->nullable(); // Jalan, RT/RW
-            
+
             $table->date('birth_date')->nullable();
             $table->string('study_program')->nullable(); // Jurusan/Prodi
             $table->string('student_id_number')->nullable(); // NIS
@@ -34,7 +34,7 @@ return new class extends Migration
     {
         Schema::table('resident_profiles', function (Blueprint $table) {
             $table->text('alamat_asal')->nullable();
-            
+
             $table->dropForeign(['province_id']);
             $table->dropForeign(['city_id']);
             $table->dropForeign(['district_id']);

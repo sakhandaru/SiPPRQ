@@ -1,14 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\KasPayment;
 use App\Models\Balance;
-use App\Models\Cashflow;
 use App\Models\Bill;
 use App\Models\FeeSetting;
+use App\Models\KasPayment;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 test('system can generate monthly bills', function () {
     // 1. Setup Data
@@ -26,7 +25,7 @@ test('system can generate monthly bills', function () {
         'amount' => 125000,
         'status' => 'UNPAID',
     ]);
-    
+
     $this->assertDatabaseHas('bills', [
         'user_id' => $user->id,
         'type' => 'WIFI',
@@ -43,9 +42,9 @@ test('user can upload payment proof for a bill', function () {
         'type' => 'KAS',
         'month' => now()->startOfMonth(),
         'amount' => 125000,
-        'status' => 'UNPAID'
+        'status' => 'UNPAID',
     ]);
-    
+
     $file = UploadedFile::fake()->image('proof.jpg');
 
     $response = $this->actingAs($user)->post(route('user.payments.store'), [
@@ -54,7 +53,7 @@ test('user can upload payment proof for a bill', function () {
     ]);
 
     $response->assertRedirect(route('user.payments.index'));
-    
+
     $this->assertDatabaseHas('kas_payments', [
         'user_id' => $user->id,
         'bill_id' => $bill->id,
@@ -66,13 +65,13 @@ test('user can upload payment proof for a bill', function () {
 test('admin can verify payment and it updates bill and balance', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
     $user = User::factory()->create(['role' => 'USER']);
-    
+
     $bill = Bill::create([
         'user_id' => $user->id,
         'type' => 'KAS',
         'month' => now()->startOfMonth(),
         'amount' => 125000,
-        'status' => 'UNPAID'
+        'status' => 'UNPAID',
     ]);
 
     $payment = KasPayment::create([
@@ -87,7 +86,7 @@ test('admin can verify payment and it updates bill and balance', function () {
     $response = $this->actingAs($admin)->post(route('admin.payments.verify', $payment->id));
 
     $response->assertSessionHas('success');
-    
+
     // Check Payment Status
     $this->assertDatabaseHas('kas_payments', [
         'id' => $payment->id,
@@ -109,7 +108,7 @@ test('admin can verify payment and it updates bill and balance', function () {
 
 test('admin can create manual expense and it decreases balance', function () {
     $admin = User::factory()->create(['role' => 'ADMIN']);
-    
+
     Balance::create(['id' => 1, 'current_balance' => 500000]);
 
     $response = $this->actingAs($admin)->post(route('admin.cashflows.store'), [
@@ -128,7 +127,7 @@ test('admin can create manual expense and it decreases balance', function () {
 test('user cannot access admin payment verification', function () {
     $user = User::factory()->create(['role' => 'USER']);
     // Setup dummy bill/payment to try
-    $bill = Bill::create(['user_id'=>$user->id, 'type'=>'KAS', 'month'=>now(), 'amount'=>1, 'status'=>'UNPAID']);
+    $bill = Bill::create(['user_id' => $user->id, 'type' => 'KAS', 'month' => now(), 'amount' => 1, 'status' => 'UNPAID']);
     $payment = KasPayment::create([
         'user_id' => $user->id,
         'bill_id' => $bill->id,
