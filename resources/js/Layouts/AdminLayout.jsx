@@ -23,27 +23,45 @@ export default function AdminLayout({ children, title }) {
                     <img src="/logoSiPPRQ.png" alt="SiPPRQ" className="w-48 h-auto" />
                 </div>
 
-                <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                    {links.map((link) => {
-                        const active = route().current(link.route + '*');
-                        return (
-                            <Link
-                                key={link.name}
-                                href={route(link.route)}
-                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-200 ${
-                                    active 
-                                        ? 'bg-black text-white shadow-md' 
-                                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                                }`}
-                            >
-                                <svg className={`w-5 h-5 mr-3 ${active ? 'text-white' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={link.icon} />
-                                </svg>
-                                {link.name}
-                            </Link>
-                        );
-                    })}
-                </nav>
+                <nav className="flex-1 px-6 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
+    {/* Label Menu (Opsional, memberikan kesan terorganisir) */}
+    <p className="px-4 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-6">
+        Main Menu
+    </p>
+    
+    {links.map((link) => {
+        const active = route().current(link.route + '*');
+        return (
+            <Link
+                key={link.name}
+                href={route(link.route)}
+                className={`flex items-center px-4 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl transition-all duration-300 group ${
+                    active 
+                        ? 'bg-zinc-900 text-white shadow-xl shadow-zinc-200 translate-x-1' 
+                        : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
+                }`}
+            >
+                {/* Icon Box: Memberikan struktur visual bento pada ikon */}
+                <div className={`p-2 rounded-xl mr-3 transition-colors duration-300 ${
+                    active 
+                        ? 'bg-emerald-500/20 text-emerald-400 shadow-inner' 
+                        : 'bg-zinc-100 text-zinc-400 group-hover:bg-zinc-200'
+                }`}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={link.icon} />
+                    </svg>
+                </div>
+
+                <span className="leading-none">{link.name}</span>
+                
+                {/* Indikator aktif di ujung kanan (Opsional) */}
+                {active && (
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                )}
+            </Link>
+        );
+    })}
+</nav>
 
                 <div className="p-4 border-t border-gray-50">
                      <div className="flex items-center px-4 py-3 bg-gray-50 rounded-xl mb-2">

@@ -33,117 +33,154 @@ export default function Edit({ user }) {
         put(route('admin.users.update', user.id));
     }
 
+    // Helper Component for Bento Consistency
+    const BentoCard = ({ children, className = "", noPadding = false }) => (
+        <div className={`bg-white rounded-[2.5rem] border border-zinc-200/60 shadow-sm transition-all duration-300 hover:shadow-md ${noPadding ? '' : 'p-8'} ${className}`}>
+            {children}
+        </div>
+    );
+
     return (
         <AdminLayout title={`Edit Resident: ${user.name}`}>
             <Head title="Edit Resident" />
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-3xl">
-                <form onSubmit={submit} className="space-y-6">
-                    
-                    {/* ACCOUNT INFO */}
+            <div className="max-w-4xl mx-auto space-y-6 pb-12 px-2">
+                
+                {/* HEADER */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">Account Information</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input
-                                    type="text"
-                                    className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    value={data.name}
-                                    onChange={e => setData('name', e.target.value)}
-                                    required
-                                />
-                                {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input
-                                    type="email"
-                                    className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    value={data.email}
-                                    onChange={e => setData('email', e.target.value)}
-                                    required
-                                />
-                                {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Password (Leave blank to keep)</label>
-                                <input
-                                    type="password"
-                                    className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    value={data.password}
-                                    onChange={e => setData('password', e.target.value)}
-                                    placeholder="********"
-                                />
-                                {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
-                            </div>
-                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                <input
-                                    type="text"
-                                    className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    value={data.phone}
-                                    onChange={e => setData('phone', e.target.value)}
-                                />
-                                {errors.phone && <div className="text-red-500 text-xs mt-1">{errors.phone}</div>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                                <select
-                                    className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    value={data.role}
-                                    onChange={e => setData('role', e.target.value)}
-                                >
-                                    <option value="USER">Resident (User)</option>
-                                    <option value="ADMIN">Admin</option>
-                                </select>
-                                {errors.role && <div className="text-red-500 text-xs mt-1">{errors.role}</div>}
-                            </div>
-                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                <select
-                                    className="w-full rounded-xl border-gray-200 focus:border-black focus:ring-black"
-                                    value={data.status}
-                                    onChange={e => setData('status', e.target.value)}
-                                >
-                                    <option value="AKTIF">Active</option>
-                                    <option value="NONAKTIF">Inactive</option>
-                                    <option value="ALUMNI">Alumni</option>
-                                </select>
-                                {errors.status && <div className="text-red-500 text-xs mt-1">{errors.status}</div>}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* RESIDENT PROFILE */}
-                    {data.role === 'USER' && (
-                        <div className="animate-fade-in-up">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2 pt-4">Resident Profile</h3>
-                            <ResidentFormFields 
-                                data={data}
-                                setData={setData}
-                                errors={errors}
-                            />
-                        </div>
-                    )}
-
-                    <div className="pt-6 flex gap-4 border-t border-gray-100">
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg disabled:opacity-50"
-                        >
-                            {processing ? 'Saving...' : 'Save Changes'}
-                        </button>
-                        <Link
-                            href={route('admin.users.index')}
-                            className="px-8 py-3 rounded-xl font-bold text-gray-500 hover:text-gray-900 transition"
-                        >
-                            Cancel
+                        <Link href={route('admin.users.index')} className="text-zinc-400 text-xs font-bold uppercase tracking-[0.2em] mb-1 hover:text-emerald-500 transition-colors">
+                            ← Back to Directory
                         </Link>
+                        <h1 className="text-3xl font-bold text-zinc-900 tracking-tight italic">
+                            Modifying <span className="text-emerald-600 not-italic uppercase text-2xl font-black tracking-tighter">Resident Data</span>
+                        </h1>
                     </div>
+                </div>
 
-                </form>
+                <BentoCard className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <form onSubmit={submit} className="space-y-8">
+                        
+                        {/* ACCOUNT INFO */}
+                        <div className="space-y-6">
+                            <h3 className="text-xs font-black text-zinc-900 uppercase tracking-[0.3em] flex items-center gap-3">
+                                <span className="w-8 h-px bg-zinc-900"></span> Account Credentials
+                            </h3>
+
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Full Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full rounded-2xl border-zinc-200 focus:border-emerald-500 focus:ring-0 py-3 text-sm font-bold text-zinc-700 bg-white"
+                                        value={data.name}
+                                        onChange={e => setData('name', e.target.value)}
+                                        required
+                                    />
+                                    {errors.name && <div className="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-1">{errors.name}</div>}
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Email Address</label>
+                                    <input
+                                        type="email"
+                                        className="w-full rounded-2xl border-zinc-200 focus:border-emerald-500 focus:ring-0 py-3 text-sm font-bold text-zinc-700 bg-white"
+                                        value={data.email}
+                                        onChange={e => setData('email', e.target.value)}
+                                        required
+                                    />
+                                    {errors.email && <div className="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-1">{errors.email}</div>}
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Password (Leave blank to keep)</label>
+                                    <input
+                                        type="password"
+                                        className="w-full rounded-2xl border-zinc-200 focus:border-emerald-500 focus:ring-0 py-3 text-sm font-bold text-zinc-700 bg-white"
+                                        value={data.password}
+                                        onChange={e => setData('password', e.target.value)}
+                                        placeholder="••••••••"
+                                    />
+                                    {errors.password && <div className="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-1">{errors.password}</div>}
+                                </div>
+                                 <div>
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Phone</label>
+                                    <input
+                                        type="text"
+                                        className="w-full rounded-2xl border-zinc-200 focus:border-emerald-500 focus:ring-0 py-3 text-sm font-bold text-zinc-700 bg-white"
+                                        value={data.phone}
+                                        onChange={e => setData('phone', e.target.value)}
+                                    />
+                                    {errors.phone && <div className="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-1">{errors.phone}</div>}
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Role</label>
+                                    <div className='relative'>
+                                        <select
+                                            className="w-full rounded-2xl border-zinc-200 focus:border-emerald-500 focus:ring-0 py-3 text-xs font-bold text-zinc-700 bg-white appearance-none"
+                                            value={data.role}
+                                            onChange={e => setData('role', e.target.value)}
+                                        >
+                                            <option value="USER">Resident (User)</option>
+                                            <option value="ADMIN">Admin</option>
+                                        </select>
+                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-400">
+                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
+                                    {errors.role && <div className="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-1">{errors.role}</div>}
+                                </div>
+                                 <div>
+                                    <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2 block">Status</label>
+                                    <div className='relative'>
+                                        <select
+                                            className="w-full rounded-2xl border-zinc-200 focus:border-emerald-500 focus:ring-0 py-3 text-xs font-bold text-zinc-700 bg-white appearance-none"
+                                            value={data.status}
+                                            onChange={e => setData('status', e.target.value)}
+                                        >
+                                            <option value="AKTIF">Active</option>
+                                            <option value="NONAKTIF">Inactive</option>
+                                            <option value="ALUMNI">Alumni</option>
+                                        </select>
+                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-zinc-400">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
+                                    {errors.status && <div className="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-1">{errors.status}</div>}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* RESIDENT PROFILE */}
+                        {data.role === 'USER' && (
+                           <div className="space-y-6 pt-4 border-t border-zinc-100">
+                                <h3 className="text-xs font-black text-zinc-900 uppercase tracking-[0.3em] flex items-center gap-3">
+                                    <span className="w-8 h-px bg-zinc-900"></span> Extended Profile
+                                </h3>
+                                <ResidentFormFields 
+                                    data={data}
+                                    setData={setData}
+                                    errors={errors}
+                                />
+                            </div>
+                        )}
+
+                        <div className="pt-8 flex gap-4 border-t border-zinc-100">
+                             <Link
+                                href={route('admin.users.index')}
+                                className="flex-1 py-4 bg-zinc-100 rounded-2xl font-black text-[10px] text-zinc-400 uppercase tracking-widest hover:bg-zinc-200 transition-all text-center"
+                            >
+                                Cancel
+                            </Link>
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="flex-[2] py-4 bg-emerald-500 text-emerald-950 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 disabled:opacity-50 active:scale-95"
+                            >
+                                {processing ? 'Updating...' : 'Save Changes'}
+                            </button>
+                        </div>
+
+                    </form>
+                </BentoCard>
             </div>
         </AdminLayout>
     );

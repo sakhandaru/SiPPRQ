@@ -12,47 +12,53 @@ class TrackerController extends Controller
     public function index(Request $request)
     {
         $year = $request->input('year', now()->year);
-        $month = $request->input('month', now()->month);
+        $month = $request->input('month'); // Allow null for all months
         $status = $request->input('status', 'ALL'); // UNPAID, PAID, WAITING
         $type = $request->input('type', 'ALL'); // KAS, WIFI, INCIDENTAL
 
-        $query = Bill::with(['user', 'latestPayment'])
+        // 1. Build Base Query (Filters: Year, Month, Type)
+        $baseQuery = Bill::with(['user', 'latestPayment'])
             ->latest('month');
 
-        // Filter by Year (Optional: if empty, show all)
+        // Filter by Year
         if ($year) {
-            $query->whereYear('month', $year);
+            $baseQuery->whereYear('month', $year);
         }
 
-        // Filter by Month (Optional: if empty, show all)
+        // Filter by Month
         if ($month) {
-            $query->whereMonth('month', $month);
+            $baseQuery->whereMonth('month', $month);
         }
 
         // Filter by Type
         if ($type !== 'ALL') {
-            $query->where('type', $type);
+            $baseQuery->where('type', $type);
         }
 
-        // Filter by Status
-        // Note: Status in DB is 'UNPAID' or 'PAID'. 
-        // 'WAITING' is a derived state (UNPAID + has PENDING payment).
-        // Since we can't easily query derived state without complex subqueries, 
-        // we'll filter 'PAID' and 'UNPAID' at DB level, 
-        // but 'WAITING' might need post-filtering or a whereHas check.
-        
+        // 2. Calculate Stats based on Base Query (Dynamic but ignoring Status filter)
+        $stats = [
+            'total_paid' => (clone $baseQuery)->where('status', 'PAID')->count(),
+            'total_unpaid' => (clone $baseQuery)->where('status', 'UNPAID')->count(), // Total Unpaid (including waiting)
+            'total_waiting' => (clone $baseQuery)->where('status', 'UNPAID')->whereHas('latestPayment', function($q) {
+                $q->where('status', 'PENDING');
+            })->count(),
+        ];
+
+        // 3. Apply Status Filter for the Table View
+        $tableQuery = clone $baseQuery;
+
         if ($status === 'PAID') {
-            $query->where('status', 'PAID');
+            $tableQuery->where('status', 'PAID');
         } elseif ($status === 'UNPAID') {
-            $query->where('status', 'UNPAID');
+            $tableQuery->where('status', 'UNPAID');
         } elseif ($status === 'WAITING') {
-            $query->where('status', 'UNPAID')->whereHas('latestPayment', function($q) {
+            $tableQuery->where('status', 'UNPAID')->whereHas('latestPayment', function($q) {
                 $q->where('status', 'PENDING');
             });
         }
 
-        // Pagination
-        $bills = $query->paginate(20)->through(function ($bill) {
+        // 4. Pagination
+        $bills = $tableQuery->paginate(20)->through(function ($bill) {
             // Determine display status
             $displayStatus = $bill->status; // PAID or UNPAID
             if ($bill->status === 'UNPAID' && $bill->latestPayment && $bill->latestPayment->status === 'PENDING') {
@@ -70,21 +76,7 @@ class TrackerController extends Controller
                 'status' => $displayStatus,
                 'payment_id' => $bill->latestPayment ? $bill->latestPayment->id : null,
             ];
-        });
-
-        // Stats (Global or Filtered? Let's do Global for current view context)
-        // Actually, stats should reflect the current filter context to be useful
-        // But for "Dashboard" like stats, maybe global UNPAID count is more useful?
-        // Let's keep it simple: Stats for *current filtered view* might be confusing if paginated.
-        // Let's show Global Stats for Current Month by default? Or just totals from the query?
-        // Let's return totals for the current filter scope (ignoring pagination).
-        
-        // Re-instantiate query for stats to avoid messing up pagination
-        // Optimization: This might be heavy if many records. Let's do simple global stats for now.
-        $stats = [
-            'total_unpaid' => Bill::where('status', 'UNPAID')->count(),
-            'total_waiting' => Bill::where('status', 'UNPAID')->whereHas('latestPayment', function($q){ $q->where('status', 'PENDING'); })->count(),
-        ];
+        })->appends($request->only(['year', 'month', 'status', 'type'])); // Append filters to pagination links
 
         return Inertia::render('Admin/Tracker/Index', [
             'bills' => $bills,
@@ -95,7 +87,8 @@ class TrackerController extends Controller
                 'status' => $status,
                 'type' => $type,
             ],
-            'users' => \App\Models\User::where('role', 'USER')->where('status', 'AKTIF')->select('id', 'name')->orderBy('name')->get(), // For Manual Bill Creation
+            'users' => \App\Models\User::where('role', 'USER')->where('status', 'AKTIF')->select('id', 'name')->orderBy('name')->get(),
         ]);
     }
 }
+

@@ -16,7 +16,10 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, string $role): Response
     {
         if (! $request->user() || $request->user()->role !== $role) {
-            abort(403, 'Unauthorized.');
+            if ($request->expectsJson()) {
+                abort(403, 'Unauthorized.');
+            }
+            return redirect()->route('dashboard')->with('error', 'You do not have permission to access that page.');
         }
 
         return $next($request);
