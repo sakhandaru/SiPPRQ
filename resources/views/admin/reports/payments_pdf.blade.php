@@ -14,7 +14,7 @@
     <div class="header">
         <h2>Payments Report</h2>
         <p>
-            Period: {{ $request->month ? Carbon\Carbon::create()->month($request->month)->format('F') : 'All Months' }} 
+            Period: {{ $request->month ? Carbon\Carbon::create()->month((int)$request->month)->format('F') : 'All Months' }} 
             {{ $request->year ?? 'All Years' }}
         </p>
     </div>

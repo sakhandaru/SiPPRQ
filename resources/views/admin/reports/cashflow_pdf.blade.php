@@ -96,7 +96,7 @@
             <td class="title-cell">
                 <h2 class="header-title">Cashflow Report</h2>
                 <p class="header-subtitle">
-                    Period: {{ $request->month ? Carbon\Carbon::create()->month($request->month)->format('F') : 'All Months' }} 
+                    Period: {{ $request->month ? Carbon\Carbon::create()->month((int)$request->month)->format('F') : 'All Months' }} 
                     {{ $request->year ?? 'All Years' }}
                 </p>
             </td>
