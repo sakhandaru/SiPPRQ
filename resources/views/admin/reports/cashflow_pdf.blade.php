@@ -2,103 +2,147 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Cashflow Report</title>
+    <title>Cashflow Report - SiPPRQ</title>
     <style>
+        /* 1. BASE CONFIG & FONTS */
+        @page { margin: 1.2cm; }
         body { 
             font-family: 'Helvetica', 'Arial', sans-serif; 
-            font-size: 12px; 
-            color: #333;
-            line-height: 1.4;
+            font-size: 10px; 
+            color: #18181b; /* Zinc 900 */
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
         }
 
-        /* 1. Header Layout Menggunakan Tabel (Paling Stabil untuk PDF) */
+        /* 2. SOPHISTICATED HEADER */
         .header-table {
             width: 100%;
             border-collapse: collapse;
-            border-bottom: 2px solid #444; /* Garis bawah header */
-            margin-bottom: 20px;
+            margin-bottom: 45px;
         }
-        .header-table td {
-            border: none;
-            vertical-align: middle; /* Kunci agar logo tidak terlalu ke atas */
-            padding-bottom: 15px;
+        .header-table td { vertical-align: bottom; }
+        .logo { height: 32px; }
+        
+        .report-title {
+            font-family: 'Georgia', serif; 
+            font-size: 26px;
+            font-style: italic;
+            font-weight: normal;
+            margin: 0;
+            color: #18181b;
+            letter-spacing: -1px;
         }
-        .logo-cell {
-            width: 30%;
-        }
-        .title-cell {
-            width: 70%;
-            text-align: right;
-        }
-        .logo {
-            height: 40px; /* Atur tinggi logo di sini */
+        .report-label {
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #10b981; /* Emerald 500 */
+            margin-bottom: 6px;
             display: block;
         }
-        .header-title {
-            margin: 0;
-            font-size: 20px;
-            color: #000;
-        }
-        .header-subtitle {
-            margin: 5px 0 0 0;
-            font-size: 12px;
-            color: #666;
+        .period-info {
+            font-size: 10px;
+            color: #71717a; /* Zinc 400 */
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
-        /* 2. Styling Tabel Data */
-        table.data-table {
+        /* 3. CLEAN DATA TABLE */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 30px;
         }
-        table.data-table th {
-            background-color: #f2f2f2;
-            border: 1px solid #ddd;
-            padding: 10px 8px;
+        .data-table th {
+            border-bottom: 1.5px solid #18181b; /* Thicker hairline for header */
+            padding: 12px 8px;
             text-align: left;
-            font-size: 11px;
+            font-size: 9px;
+            font-weight: 900;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #18181b;
         }
-        table.data-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        .data-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #f4f4f5; /* Zinc 100 */
             vertical-align: top;
         }
 
-        /* 3. Warna Indikator */
-        .in { color: #28a745; font-weight: bold; }
-        .out { color: #dc3545; font-weight: bold; }
+        /* 4. TYPOGRAPHY & UTILITIES */
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-mono { font-family: 'Courier', monospace; } /* Better for numbers */
+        
+        .badge-in { color: #059669; font-weight: bold; }
+        .badge-out { color: #e11d48; font-weight: bold; }
+        
+        .desc-text {
+            color: #52525b;
+            font-size: 9px;
+            line-height: 1.4;
+            display: block;
+            margin-top: 4px;
+        }
 
-        /* 4. Bagian Summary */
+        /* 5. BENTO SUMMARY BOX */
         .summary-container {
-            margin-top: 30px;
             width: 100%;
+            margin-top: 20px;
         }
         .summary-table {
-            width: 250px; /* Lebar box ringkasan */
-            margin-left: auto; /* Paksa ke kanan */
+            width: 260px;
+            margin-left: auto;
             border-collapse: collapse;
         }
         .summary-table td {
-            padding: 5px 0;
-            border: none;
+            padding: 8px 0;
         }
-        .text-right { text-align: right; }
-        .border-top { border-top: 1px solid #333 !important; font-weight: bold; padding-top: 8px !important; }
+        .summary-label {
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #a1a1aa;
+            letter-spacing: 1px;
+        }
+        .net-row td {
+            border-top: 1.5px solid #18181b;
+            padding-top: 12px;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 8px;
+            color: #d4d4d8;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .copyright {
+            color: #c7c7c7;
+        }
     </style>
 </head>
 <body>
 
     <table class="header-table">
         <tr>
-            <td class="logo-cell">
+            <td>
                 <img src="{{ public_path('logoSiPPRQ.png') }}" alt="Logo" class="logo">
             </td>
-            <td class="title-cell">
-                <h2 class="header-title">Cashflow Report</h2>
-                <p class="header-subtitle">
-                    Period: {{ $request->month ? Carbon\Carbon::create()->month((int)$request->month)->format('F') : 'All Months' }} 
-                    {{ $request->year ?? 'All Years' }}
-                </p>
+            <td class="text-right">
+                <span class="report-label">PPRQ Annasimiyyah</span>
+                <h1 class="report-title">Cashflow <span style="color: #10b981;">Intelligence</span></h1>
+                <div class="period-info" style="margin-top: 5px;">
+                    {{ $request->month ? Carbon\Carbon::create()->month((int)$request->month)->format('F') : 'Annual' }} 
+                    {{ $request->year ?? 'Records' }}
+                </div>
             </td>
         </tr>
     </table>
@@ -106,25 +150,35 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 12%;">Date</th>
-                <th style="width: 15%;">Category</th>
-                <th>Description</th>
-                <th style="width: 8%;">Type</th>
-                <th style="width: 18%;">Amount</th>
+                <th style="width: 15%;">Date / Time</th>
+                <th style="width: 18%;">Category</th>
+                <th>Objective Details</th>
+                <th style="width: 8%; text-align: center;">Flow</th>
+                <th style="width: 20%; text-align: right;">Amount</th>
             </tr>
         </thead>
         <tbody>
             @foreach($data as $row)
             <tr>
-                <td>{{ $row->created_at->format('d/m/Y') }}</td>
-                <td>{{ $row->category }}</td>
-                <td>{{ $row->description }}</td>
+                <td>
+                    <div style="font-weight: bold;">{{ $row->created_at->format('d M Y') }}</div>
+                    <div style="font-size: 8px; color: #a1a1aa;">{{ $row->created_at->format('H:i') }}</div>
+                </td>
+                <td style="font-weight: bold;">{{ $row->category }}</td>
+                <td>
+                    <div style="color: #18181b; font-weight: bold;">{{ $row->category }} Transaction</div>
+                    <span class="desc-text italic">
+                        {{ $row->description ?? 'No additional description provided.' }}
+                    </span>
+                </td>
                 <td class="text-center">
-                    <span class="{{ $row->direction == 'IN' ? 'in' : 'out' }}">
+                    <span class="{{ $row->direction == 'IN' ? 'badge-in' : 'badge-out' }}">
                         {{ $row->direction }}
                     </span>
                 </td>
-                <td class="text-right">Rp {{ number_format($row->amount, 0, ',', '.') }}</td>
+                <td class="text-right font-mono" style="font-size: 11px; font-weight: bold;">
+                    {{ $row->direction == 'IN' ? '+' : '-' }} {{ number_format($row->amount, 0, ',', '.') }}
+                </td>
             </tr>
             @endforeach
         </tbody>
@@ -133,20 +187,25 @@
     <div class="summary-container">
         <table class="summary-table">
             <tr>
-                <td>Total Income</td>
-                <td class="text-right"><span class="in">Rp {{ number_format($totalIn, 0, ',', '.') }}</span></td>
+                <td class="summary-label">Total Inflow</td>
+                <td class="text-right font-mono badge-in" style="font-size: 11px;">+ {{ number_format($totalIn, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td>Total Expense</td>
-                <td class="text-right"><span class="out">Rp {{ number_format($totalOut, 0, ',', '.') }}</span></td>
+                <td class="summary-label">Total Outflow</td>
+                <td class="text-right font-mono badge-out" style="font-size: 11px;">- {{ number_format($totalOut, 0, ',', '.') }}</td>
             </tr>
-            <tr>
-                <td class="border-top">Net Change</td>
-                <td class="text-right border-top">
+            <tr class="net-row">
+                <td style="text-transform: uppercase; letter-spacing: 1px;">Net Change</td>
+                <td class="text-right font-mono">
                     Rp {{ number_format($totalIn - $totalOut, 0, ',', '.') }}
                 </td>
             </tr>
         </table>
+    </div>
+
+    <div class="footer">
+        Generated by SiPPRQ Intelligent Terminal • {{ now()->format('d/m/Y H:i:s') }} <br>
+        Copyright <span class="copyright">@sakhandaru</span>
     </div>
 
 </body>

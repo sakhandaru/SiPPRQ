@@ -39,7 +39,7 @@ export default function Dashboard({ auth, data, latestResidents, latestPayments,
                             </p>
                         </div>
                         <div className="bg-zinc-900 text-white px-4 py-2 rounded-2xl text-xs font-mono shadow-lg">
-                            {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} • {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                     </div>
                 </div>
